@@ -42,14 +42,8 @@ export const About: React.FC = () => {
     {
       name: 'Elena Volkov',
       role: 'Head of Product',
-      bio: 'Product strategist with extensive experience in Web3 user experience and community building.',
+      bio: 'Product strategist with extensive experience in user experience and community building.',
       avatar: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg',
-    },
-    {
-      name: 'David Kim',
-      role: 'Head of Security',
-      bio: 'Cybersecurity expert specializing in blockchain security audits and smart contract verification.',
-      avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg',
     },
   ];
 
@@ -221,32 +215,34 @@ export const About: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card className="p-6 text-center">
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-                  />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                    {member.name}
-                  </h3>
-                  <p className="text-blue-600 font-medium mb-3">
-                    {member.role}
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    {member.bio}
-                  </p>
-                </Card>
-              </motion.div>
-            ))}
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {team.map((member, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="p-6 text-center">
+                    <img
+                      src={member.avatar}
+                      alt={member.name}
+                      className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
+                    />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                      {member.name}
+                    </h3>
+                    <p className="text-blue-600 font-medium mb-3">
+                      {member.role}
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      {member.bio}
+                    </p>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

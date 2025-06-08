@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Main Entry Point (`src/main.tsx`)
+
+`src/main.tsx` is the primary entry point for the Vite React application. It is responsible for:
+
+- Importing necessary React and ReactDOM client modules.
+- Importing the root `App` component and global styles.
+- Using `createRoot` to render the `App` component into the `root` element in `index.html`.
+- Wrapping the `App` component with `StrictMode` for highlighting potential problems in an application.

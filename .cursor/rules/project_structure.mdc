@@ -1,0 +1,22 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Structure
+
+This project follows a standard Vite/React application structure. Below are the key directories and files:
+
+- **`src/`**: Contains all source code for the application.
+  - **`src/main.tsx`**: The main entry point of the application, responsible for rendering the React application.
+  - **`src/App.tsx`**: The root component of the React application.
+  - **`src/components/`**: Houses reusable React components.
+  - **`src/pages/`**: Contains individual page components.
+  - **`src/config/`**: Holds application-wide configuration files.
+  - **`src/data/`**: Stores static data or mock data.
+  - **`src/types/`**: Defines TypeScript type definitions.
+- **`public/`**: Contains static assets.
+- **`vite.config.ts`**: Vite build configuration.
+- **`tailwind.config.js`**: Tailwind CSS configuration.
+- **`eslint.config.js`**: ESLint configuration for code linting.
+- **`package.json`**: Defines project metadata and dependencies.

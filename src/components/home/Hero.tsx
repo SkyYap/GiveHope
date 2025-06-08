@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { ArrowRight, TrendingUp, Users, DollarSign } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Link } from 'react-router-dom';
 
@@ -59,7 +59,7 @@ export const Hero: React.FC = () => {
               <Link to="/discover">
                 <Button 
                   size="lg" 
-                  className="bg-white text-blue-600 hover:bg-blue-50 hover:text-blue-700 w-full sm:w-auto font-semibold shadow-lg"
+                  className="bg-blue-600 text-white hover:bg-blue-700 hover:text-white w-full sm:w-auto font-semibold shadow-lg"
                 >
                   Explore Projects
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-blue-600 w-full sm:w-auto font-semibold"
+                  className="border-2 border-white text-white hover:bg-white hover:text-purple-700 w-full sm:w-auto font-semibold"
                 >
                   Start Campaign
                 </Button>

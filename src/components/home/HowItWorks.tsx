@@ -79,11 +79,6 @@ export const HowItWorks: React.FC = () => {
             </motion.div>
           ))}
         </div>
-
-        {/* Connecting Lines */}
-        <div className="hidden lg:block relative -mt-20 mb-16">
-          <div className="absolute top-8 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 opacity-30" />
-        </div>
       </div>
     </section>
   );

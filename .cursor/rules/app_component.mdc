@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Root Application Component (`src/App.tsx`)
+
+`src/App.tsx` serves as the root component of the React application. It is responsible for:
+
+- Setting up client-side routing using `react-router-dom`.
+- Configuring Web3 providers (`WagmiProvider`, `RainbowKitProvider`) for blockchain interaction.
+- Integrating `react-query` for data fetching and caching.
+- Defining the main layout of the application, including `Header` and `Footer` components.
+- Managing application routes and rendering the appropriate page components (`Home`, `Discover`, `ProjectDetails`, `CreateCampaign`, `About`).
