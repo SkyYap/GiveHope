@@ -7,7 +7,6 @@ import {
   Upload, 
   Plus, 
   X, 
-  Eye,
   AlertCircle,
   CheckCircle2 
 } from 'lucide-react';
@@ -44,7 +43,6 @@ interface FormData {
 
 export const CreateCampaign: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [preview, setPreview] = useState(false);
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>();
 
   const totalSteps = 6;
@@ -513,12 +511,12 @@ export const CreateCampaign: React.FC = () => {
                       By submitting, you agree to our terms of service and campaign guidelines.
                     </p>
                     <div className="flex justify-center space-x-4">
-                      <Button type="button" variant="outline" onClick={() => setPreview(true)}>
+                      {/* <Button type="button" variant="outline" onClick={() => setPreview(true)}>
                         <Eye className="w-4 h-4 mr-2" />
                         Preview Campaign
-                      </Button>
+                      </Button> */}
                       <Button type="submit" size="lg">
-                        Submit for Review
+                        Create Onchain Now
                       </Button>
                     </div>
                   </div>

@@ -7,6 +7,7 @@ export const categories: Category[] = [
   { id: 'infrastructure', name: 'Infrastructure', icon: '⚙️', color: 'bg-orange-500' },
   { id: 'dao', name: 'DAO', icon: '🏛️', color: 'bg-indigo-500' },
   { id: 'metaverse', name: 'Metaverse', icon: '🌐', color: 'bg-pink-500' },
+  { id: 'tooling', name: 'Tooling', icon: '🔧', color: 'bg-yellow-500' },
 ];
 
 export const mockProjects: Project[] = [

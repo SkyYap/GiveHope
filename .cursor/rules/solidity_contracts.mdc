@@ -1,0 +1,66 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Solidity Contracts Structure for Campaign Management dApp
+
+This document outlines the expected structure and core functionalities for Solidity smart contracts within this project, focusing on a campaign management dApp.
+
+## 1. State Variables
+
+These variables store persistent data on the blockchain.
+
+*   **Campaign Data**: A structure or mapping to hold details for each campaign (e.g., `campaignId`, `ownerAddress`, `title`, `description`, `goalAmount`, `currentAmount`, `deadline`).
+*   **Counters**: To generate unique IDs for new campaigns.
+*   **Ownership**: `owner`and `campaignOwner`. `owner` able to access `campaignOwner`function too.
+
+## 2. Constructor
+
+An optional function that runs only once when the contract is deployed.
+
+*   **Initialization**: To set initial values for state variables or to assign the deployer as the contract owner.
+
+## 3. Core Functions (Write Operations - changing state)
+
+These functions modify the state of the contract and typically require a transaction (costing gas).
+
+*   **Create Campaign**: A function allowing users to define and launch a new campaign, including all relevant details.
+*   **Contribute/Donate**: A function for users to send cryptocurrency to a specific campaign. This would update the `currentAmount` of the campaign.
+*   **Withdraw Funds**: A function, likely restricted to the campaign owner, to retrieve the raised funds after the campaign conditions are met (e.g., deadline passed and goal met).
+*   **End Campaign**: A function to formally conclude a campaign, possibly setting its status.
+
+## 4. Read Functions (View/Pure Operations - reading state)
+
+These functions retrieve data from the contract without changing its state and are free to call.
+
+*   **Get Campaign Details**: A function to fetch all stored information about a specific campaign by its ID.
+*   **Get All Campaigns**: A function to retrieve a list of all active or completed campaigns.
+*   **Get User Contributions**: A function to see how much a specific user has contributed to a given campaign.
+*   **Get Campaigns by Owner**: A function to list all campaigns created by a particular address.
+
+## 5. Events
+
+These are used to log changes to the contract's state, allowing your frontend application to react to these changes in real-time.
+
+*   **CampaignCreated**: Emitted when a new campaign is successfully launched.
+*   **ContributionReceived**: Emitted when a user successfully contributes to a campaign.
+*   **FundsWithdrawn**: Emitted when funds are successfully withdrawn by a campaign owner.
+*   **CampaignEnded**: Emitted when a campaign is marked as ended.
+
+## 6. Modifiers (Optional)
+
+These are reusable pieces of code that can be applied to functions to check conditions before execution.
+
+*   **`onlyOwner`**: To restrict certain functions (like `withdrawFunds` from the contract itself, not campaign owner) to only the contract deployer.
+*   **`campaignExists`**: To ensure a campaign with a given ID actually exists.
+*   **`campaignActive` / `campaignEnded`**: To check the status of a campaign.
+*   **`isCampaignOwner`**: To ensure the caller is the owner of the specific campaign.
+
+## 7. Error Handling
+
+Using `require`, `revert`, and `assert` to ensure that conditions are met and to provide informative error messages if not.
+
+*   Checking sufficient funds for contributions.
+*   Ensuring deadlines are respected.
+*   Validating input parameters.
