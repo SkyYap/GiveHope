@@ -175,13 +175,16 @@ export const CreateCampaign: React.FC = () => {
     }
 
     try {
+      // Get the enum index for category
       const _category = categories.find(cat => cat.id === data.category)?.value;
       if (_category === undefined) {
         throw new Error('Invalid category selected.');
       }
+      // Prepare amounts
       const _goalAmount = parseEther(data.fundingGoal.toString());
       const _deadline = BigInt(Math.floor(Date.now() / 1000) + (data.campaignDuration * 24 * 60 * 60));
 
+      // Prepare team members and investment tiers as structs
       const _teamMembers = data.teamMembers.map(member => ({
         name: member.name,
         role: member.role,
@@ -194,21 +197,22 @@ export const CreateCampaign: React.FC = () => {
         description: tier.description,
       }));
 
+      // Call the contract with correct argument order and types
       writeContract({
         address: CROWDFUNDING_CONTRACT_ADDRESS,
         abi: abi,
         functionName: 'createCampaign',
         args: [
-          accountAddress,
-          data.title,
-          data.shortDescription,
-          _category,
-          data.description,
-          _goalAmount,
-          _deadline,
-          data.coverImage,
-          _teamMembers,
-          _investmentTiers,
+          accountAddress,                // address _campaignOwner
+          data.title,                    // string _title
+          data.shortDescription,         // string _description (short)
+          _category,                     // CampaignCategory (enum index)
+          data.description,              // string _projectDescription (long)
+          _goalAmount,                   // uint256 _goalAmount
+          _deadline,                     // uint256 _deadline
+          data.coverImage,               // string _image
+          _teamMembers,                  // TeamMember[]
+          _investmentTiers,              // InvestmentTier[]
         ],
       });
     } catch (err) {
