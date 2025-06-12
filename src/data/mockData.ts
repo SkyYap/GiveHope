@@ -1,13 +1,13 @@
 import { Project, Category } from '../types';
 
 export const categories: Category[] = [
-  { id: 'defi', name: 'DeFi', icon: '💰', color: 'bg-blue-500' },
-  { id: 'nft', name: 'NFTs', icon: '🎨', color: 'bg-purple-500' },
-  { id: 'gamefi', name: 'GameFi', icon: '🎮', color: 'bg-green-500' },
-  { id: 'infrastructure', name: 'Infrastructure', icon: '⚙️', color: 'bg-orange-500' },
-  { id: 'dao', name: 'DAO', icon: '🏛️', color: 'bg-indigo-500' },
-  { id: 'metaverse', name: 'Metaverse', icon: '🌐', color: 'bg-pink-500' },
-  { id: 'tooling', name: 'Tooling', icon: '🔧', color: 'bg-yellow-500' },
+  { id: 'defi', name: 'DeFi', icon: '💰', color: 'bg-blue-500', value: 0 },
+  { id: 'nft', name: 'NFTs', icon: '🎨', color: 'bg-purple-500', value: 1 },
+  { id: 'gamefi', name: 'GameFi', icon: '🎮', color: 'bg-green-500', value: 2 },
+  { id: 'infrastructure', name: 'Infrastructure', icon: '⚙️', color: 'bg-orange-500', value: 3 },
+  { id: 'dao', name: 'DAO', icon: '🏛️', color: 'bg-indigo-500', value: 4 },
+  { id: 'metaverse', name: 'Metaverse', icon: '🌐', color: 'bg-pink-500', value: 5 },
+  { id: 'tooling', name: 'Tooling', icon: '🔧', color: 'bg-yellow-500', value: 6 },
 ];
 
 export const mockProjects: Project[] = [

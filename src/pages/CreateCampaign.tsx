@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { 
@@ -8,11 +8,17 @@ import {
   Plus, 
   X, 
   AlertCircle,
-  CheckCircle2 
+  CheckCircle2,
+  Loader2,
+  PartyPopper,
+  Zap
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { categories } from '../data/mockData';
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
+import { abi, config, CROWDFUNDING_CONTRACT_ADDRESS } from '../config/web3';
 
 interface FormData {
   title: string;
@@ -31,7 +37,6 @@ interface FormData {
     title: string;
     minAmount: number;
     description: string;
-    rewards: string[];
   }>;
   socialLinks: {
     website: string;
@@ -43,7 +48,15 @@ interface FormData {
 
 export const CreateCampaign: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, watch, setValue, formState: { errors }, trigger } = useForm<FormData>();
+  const { address: accountAddress } = useAccount();
+  const { data: hash, writeContract, isPending: isWritePending, isError: isWriteError, error: writeError } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isConfirmError, error: confirmError } = useWaitForTransactionReceipt({ hash, config });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedCoverImageFile, setSelectedCoverImageFile] = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
+  const [isUploadingToIPFS, setIsUploadingToIPFS] = useState<boolean>(false);
 
   const totalSteps = 6;
 
@@ -56,8 +69,31 @@ export const CreateCampaign: React.FC = () => {
     { id: 6, title: 'Review', description: 'Final review' },
   ];
 
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
+  const nextStep = async () => {
+    let isValid = true;
+    if (currentStep === 1) {
+      isValid = await trigger(['title', 'shortDescription', 'category', 'description']);
+    } else if (currentStep === 2) {
+      isValid = await trigger(['fundingGoal', 'campaignDuration']);
+    } else if (currentStep === 3) {
+      isValid = await trigger('coverImage');
+    } else if (currentStep === 4) {
+      isValid = await trigger([
+        'teamMembers',
+        'teamMembers.0.name',
+        'teamMembers.0.role',
+        'teamMembers.0.bio',
+      ]);
+    } else if (currentStep === 5) {
+      isValid = await trigger([
+        'rewardTiers',
+        'rewardTiers.0.title',
+        'rewardTiers.0.minAmount',
+        'rewardTiers.0.description'
+      ])
+    }
+
+    if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -68,9 +104,116 @@ export const CreateCampaign: React.FC = () => {
     }
   };
 
-  const onSubmit = (data: FormData) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedCoverImageFile(file);
+      setCoverImagePreview(URL.createObjectURL(file));
+      setValue('coverImage', '');
+    } else {
+      setSelectedCoverImageFile(null);
+      setCoverImagePreview(null);
+      setValue('coverImage', '');
+    }
+    trigger('coverImage');
+  };
+
+  const onUploadToIPFS = async () => {
+    if (!selectedCoverImageFile) {
+      alert('Please select a file first.');
+      return;
+    }
+
+    setIsUploadingToIPFS(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedCoverImageFile);
+
+      const pinataApiKey = import.meta.env.VITE_PINATA_API_KEY;
+      const pinataSecretApiKey = import.meta.env.VITE_PINATA_SECRET_API_KEY;
+
+      if (!pinataApiKey || !pinataSecretApiKey) {
+        throw new Error('Pinata API keys are not set in environment variables.');
+      }
+
+      const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+        method: 'POST',
+        headers: {
+          'pinata_api_key': pinataApiKey,
+          'pinata_secret_api_key': pinataSecretApiKey,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Pinata upload failed: ${errorData.error}`);
+      }
+
+      const data = await response.json();
+      const ipfsHash = `ipfs://${data.IpfsHash}`;
+      setValue('coverImage', ipfsHash);
+    } catch (error: any) {
+      console.error('Error uploading to Pinata:', error);
+      alert(`Failed to upload image to IPFS: ${error.message}`);
+    } finally {
+      setIsUploadingToIPFS(false);
+    }
+  };
+
+  const onSubmit = async (data: FormData) => {
     console.log('Campaign data:', data);
-    // Handle form submission
+
+    if (!accountAddress) {
+      alert('Please connect your wallet to create a campaign.');
+      return;
+    }
+
+    if (!data.coverImage || !data.coverImage.startsWith('ipfs://')) {
+      alert('Please upload the cover image to IPFS first.');
+      return;
+    }
+
+    try {
+      const _category = categories.find(cat => cat.id === data.category)?.value;
+      if (_category === undefined) {
+        throw new Error('Invalid category selected.');
+      }
+      const _goalAmount = parseEther(data.fundingGoal.toString());
+      const _deadline = BigInt(Math.floor(Date.now() / 1000) + (data.campaignDuration * 24 * 60 * 60));
+
+      const _teamMembers = data.teamMembers.map(member => ({
+        name: member.name,
+        role: member.role,
+        bio: member.bio,
+      }));
+
+      const _investmentTiers = data.rewardTiers.map(tier => ({
+        tierTitle: tier.title,
+        minimumAmount: parseEther(tier.minAmount.toString()),
+        description: tier.description,
+      }));
+
+      writeContract({
+        address: CROWDFUNDING_CONTRACT_ADDRESS,
+        abi: abi,
+        functionName: 'createCampaign',
+        args: [
+          accountAddress,
+          data.title,
+          data.shortDescription,
+          _category,
+          data.description,
+          _goalAmount,
+          _deadline,
+          data.coverImage,
+          _teamMembers,
+          _investmentTiers,
+        ],
+      });
+    } catch (err) {
+      console.error('Error preparing contract write:', err);
+    }
   };
 
   const addTeamMember = () => {
@@ -85,7 +228,7 @@ export const CreateCampaign: React.FC = () => {
 
   const addRewardTier = () => {
     const currentTiers = watch('rewardTiers') || [];
-    setValue('rewardTiers', [...currentTiers, { title: '', minAmount: 0, description: '', rewards: [''] }]);
+    setValue('rewardTiers', [...currentTiers, { title: '', minAmount: 0, description: ''}]);
   };
 
   const removeRewardTier = (index: number) => {
@@ -96,7 +239,6 @@ export const CreateCampaign: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -111,7 +253,6 @@ export const CreateCampaign: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Progress Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -168,7 +309,6 @@ export const CreateCampaign: React.FC = () => {
           </Card>
         </motion.div>
 
-        {/* Form */}
         <motion.div
           key={currentStep}
           initial={{ opacity: 0, x: 20 }}
@@ -177,7 +317,6 @@ export const CreateCampaign: React.FC = () => {
         >
           <Card className="p-8">
             <form onSubmit={handleSubmit(onSubmit)}>
-              {/* Step 1: Basic Info */}
               {currentStep === 1 && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Basic Information</h2>
@@ -249,19 +388,18 @@ export const CreateCampaign: React.FC = () => {
                 </div>
               )}
 
-              {/* Step 2: Funding */}
               {currentStep === 2 && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Funding Details</h2>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Funding Goal (USD) *
+                      Funding Goal (RM) *
                     </label>
                     <input
                       {...register('fundingGoal', { 
                         required: 'Funding goal is required',
-                        min: { value: 1000, message: 'Minimum funding goal is $1,000' }
+                        min: { value: 1000, message: 'Minimum funding goal is RM1,000' }
                       })}
                       type="number"
                       placeholder="1000000"
@@ -305,7 +443,6 @@ export const CreateCampaign: React.FC = () => {
                 </div>
               )}
 
-              {/* Step 3: Media */}
               {currentStep === 3 && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Project Media</h2>
@@ -314,33 +451,69 @@ export const CreateCampaign: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Cover Image *
                     </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-                      <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-600 mb-2">Click to upload or drag and drop</p>
+                    <input
+                      type="file"
+                      id="coverImageInput"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/png, image/jpeg, image/jpg"
+                    />
+                    <div 
+                      className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {coverImagePreview ? (
+                        <img src={coverImagePreview} alt="Cover Preview" className="max-w-full h-48 object-contain mx-auto mb-4" />
+                      ) : (
+                        <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      )}
+                      <p className="text-gray-600 mb-2">
+                        {selectedCoverImageFile ? selectedCoverImageFile.name : 'Click to upload or drag and drop'}
+                      </p>
                       <p className="text-sm text-gray-500">PNG, JPG up to 10MB</p>
-                      <Button variant="outline" className="mt-4">
+                      <Button type="button" variant="outline" className="mt-4">
                         Choose File
                       </Button>
                     </div>
-                  </div>
+                    <input
+                      type="hidden"
+                      {...register('coverImage', {
+                        required: 'Cover image is required. Please upload and pin your image to IPFS.'
+                      })}
+                    />
+                    {errors.coverImage && (
+                      <p className="mt-1 text-sm text-red-600">{errors.coverImage.message}</p>
+                    )}
+                    {selectedCoverImageFile && !watch('coverImage') && (
+                      <div className="mt-4 text-center">
+                        <Button 
+                          type="button" 
+                          onClick={onUploadToIPFS} 
+                          disabled={isUploadingToIPFS}
+                          className="w-full"
+                        >
+                          {isUploadingToIPFS ? (
+                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading to IPFS...</>
+                          ) : (
+                            <><Upload className="w-4 h-4 mr-2" /> Upload to IPFS</>
+                          )}
+                        </Button>
+                      </div>
+                    )}
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Additional Images
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <p className="text-xs text-gray-500">Upload</p>
-                        </div>
-                      ))}
-                    </div>
+                    {watch('coverImage') && watch('coverImage').startsWith('ipfs://') && (
+                      <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-center">
+                        <CheckCircle2 className="w-5 h-5 text-green-600 mr-2" />
+                        <p className="text-sm text-green-700 font-medium">
+                          Image uploaded to IPFS! <a href={`https://ipfs.io/ipfs/${watch('coverImage').replace('ipfs://', '')}`} target="_blank" rel="noopener noreferrer" className="font-mono text-blue-600 underline break-all">{watch('coverImage')}</a>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Step 4: Team */}
               {currentStep === 4 && (
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
@@ -350,8 +523,17 @@ export const CreateCampaign: React.FC = () => {
                       Add Member
                     </Button>
                   </div>
-                  
-                  {watch('teamMembers')?.map((_, index) => (
+                  {/* Hidden input for teamMembers array validation */}
+                  <input
+                    type="hidden"
+                    {...register('teamMembers', {
+                      validate: value => (value && value.length > 0) || 'At least one team member is required'
+                    })}
+                  />
+                  {errors.teamMembers && typeof errors.teamMembers.message === 'string' && (
+                    <p className="mt-1 text-sm text-red-600">{errors.teamMembers.message}</p>
+                  )}
+                  {Array.isArray(watch('teamMembers')) && watch('teamMembers').map((_, index) => (
                     <div key={index} className="border border-gray-200 rounded-lg p-6">
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-lg font-medium">Team Member {index + 1}</h3>
@@ -370,22 +552,28 @@ export const CreateCampaign: React.FC = () => {
                             Name
                           </label>
                           <input
-                            {...register(`teamMembers.${index}.name`)}
+                            {...register(`teamMembers.${index}.name`, { required: index === 0 ? 'Name is required' : false })}
                             type="text"
                             placeholder="Full name"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
+                          {Array.isArray(errors.teamMembers) && errors.teamMembers[index]?.name && (
+                            <p className="mt-1 text-sm text-red-600">{errors.teamMembers[index]?.name?.message}</p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Role
                           </label>
                           <input
-                            {...register(`teamMembers.${index}.role`)}
+                            {...register(`teamMembers.${index}.role`, { required: index === 0 ? 'Role is required' : false })}
                             type="text"
                             placeholder="e.g. CEO, CTO, Developer"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
+                          {Array.isArray(errors.teamMembers) && errors.teamMembers[index]?.role && (
+                            <p className="mt-1 text-sm text-red-600">{errors.teamMembers[index]?.role?.message}</p>
+                          )}
                         </div>
                       </div>
                       <div className="mt-4">
@@ -393,11 +581,14 @@ export const CreateCampaign: React.FC = () => {
                           Bio
                         </label>
                         <textarea
-                          {...register(`teamMembers.${index}.bio`)}
+                          {...register(`teamMembers.${index}.bio`, { required: index === 0 ? 'Bio is required' : false })}
                           rows={3}
                           placeholder="Brief bio and experience..."
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        {Array.isArray(errors.teamMembers) && errors.teamMembers[index]?.bio && (
+                          <p className="mt-1 text-sm text-red-600">{errors.teamMembers[index]?.bio?.message}</p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -413,7 +604,6 @@ export const CreateCampaign: React.FC = () => {
                 </div>
               )}
 
-              {/* Step 5: Rewards */}
               {currentStep === 5 && (
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
@@ -423,8 +613,17 @@ export const CreateCampaign: React.FC = () => {
                       Add Tier
                     </Button>
                   </div>
-                  
-                  {watch('rewardTiers')?.map((_, index) => (
+                  {/* Hidden input for rewardTiers array validation */}
+                  <input
+                    type="hidden"
+                    {...register('rewardTiers', {
+                      validate: value => (value && value.length > 0) || 'At least one investment tier is required'
+                    })}
+                  />
+                  {errors.rewardTiers && typeof errors.rewardTiers.message === 'string' && (
+                    <p className="mt-1 text-sm text-red-600">{errors.rewardTiers.message}</p>
+                  )}
+                  {Array.isArray(watch('rewardTiers')) && watch('rewardTiers').map((_, index) => (
                     <div key={index} className="border border-gray-200 rounded-lg p-6">
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-lg font-medium">Tier {index + 1}</h3>
@@ -443,22 +642,28 @@ export const CreateCampaign: React.FC = () => {
                             Tier Title
                           </label>
                           <input
-                            {...register(`rewardTiers.${index}.title`)}
+                            {...register(`rewardTiers.${index}.title`, { required: 'Title is required' })}
                             type="text"
                             placeholder="e.g. Early Supporter"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
+                          {Array.isArray(errors.rewardTiers) && errors.rewardTiers[index]?.title && (
+                            <p className="mt-1 text-sm text-red-600">{errors.rewardTiers[index]?.title?.message}</p>
+                          )}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Minimum Amount (USD)
+                            Minimum Amount (RM)
                           </label>
                           <input
-                            {...register(`rewardTiers.${index}.minAmount`)}
+                            {...register(`rewardTiers.${index}.minAmount`, { required: 'Minimum amount is required', min: { value: 1, message: 'Minimum must be at least 1' } })}
                             type="number"
                             placeholder="100"
                             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
+                          {Array.isArray(errors.rewardTiers) && errors.rewardTiers[index]?.minAmount && (
+                            <p className="mt-1 text-sm text-red-600">{errors.rewardTiers[index]?.minAmount?.message}</p>
+                          )}
                         </div>
                       </div>
                       <div className="mb-4">
@@ -466,11 +671,14 @@ export const CreateCampaign: React.FC = () => {
                           Description
                         </label>
                         <textarea
-                          {...register(`rewardTiers.${index}.description`)}
+                          {...register(`rewardTiers.${index}.description`, { required: 'Description is required' })}
                           rows={2}
                           placeholder="Describe this investment tier..."
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        {Array.isArray(errors.rewardTiers) && errors.rewardTiers[index]?.description && (
+                          <p className="mt-1 text-sm text-red-600">{errors.rewardTiers[index]?.description?.message}</p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -486,22 +694,65 @@ export const CreateCampaign: React.FC = () => {
                 </div>
               )}
 
-              {/* Step 6: Review */}
               {currentStep === 6 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Review & Submit</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Submit</h2>
                   
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div className="flex items-start">
-                      <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" />
+                  {isWritePending && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center">
+                      <Loader2 className="w-5 h-5 text-blue-600 animate-spin mr-3" />
+                      <p className="text-sm font-medium text-blue-700">
+                        Confirming transaction... Please wait in your wallet.
+                      </p>
+                    </div>
+                  )}
+
+                  {isConfirming && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center">
+                      <Loader2 className="w-5 h-5 text-blue-600 animate-spin mr-3" />
+                      <p className="text-sm font-medium text-blue-700">
+                        Transaction pending... Waiting for confirmation.
+                      </p>
+                    </div>
+                  )}
+
+                  {isConfirmed && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+                      <PartyPopper className="w-5 h-5 text-green-600 mr-3" />
                       <div>
-                        <h4 className="font-medium text-green-900 mb-1">Campaign Ready for Review</h4>
+                        <h4 className="font-medium text-green-900 mb-1">Campaign Created Successfully!</h4>
                         <p className="text-sm text-green-700">
-                          Your campaign will be reviewed by our team within 24-48 hours. You'll receive an email once it's approved and live.
+                          Your campaign transaction is confirmed. Transaction hash: {hash}
                         </p>
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {(isWriteError || isConfirmError) && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+                      <Zap className="w-5 h-5 text-red-600 mr-3" />
+                      <div>
+                        <h4 className="font-medium text-red-900 mb-1">Transaction Failed!</h4>
+                        <p className="text-sm text-red-700">
+                          {writeError?.message || confirmError?.message || 'Unknown error occurred.'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* {!isWritePending && !isConfirming && !isConfirmed && !isWriteError && !isConfirmError && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-start">
+                        <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" />
+                        <div>
+                          <h4 className="font-medium text-green-900 mb-1">Campaign Ready for Review</h4>
+                          <p className="text-sm text-green-700">
+                            Your campaign will be reviewed by our team within 24-48 hours. You'll receive an email once it's approved and live.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )} */}
 
                   <div className="text-center py-8">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -511,19 +762,25 @@ export const CreateCampaign: React.FC = () => {
                       By submitting, you agree to our terms of service and campaign guidelines.
                     </p>
                     <div className="flex justify-center space-x-4">
-                      {/* <Button type="button" variant="outline" onClick={() => setPreview(true)}>
-                        <Eye className="w-4 h-4 mr-2" />
-                        Preview Campaign
-                      </Button> */}
-                      <Button type="submit" size="lg">
-                        Create Onchain Now
+                      <Button 
+                        type="submit" 
+                        size="lg"
+                        disabled={isWritePending || isConfirming}
+                      >
+                        {(isWritePending || isConfirming) ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Creating...
+                          </>
+                        ) : (
+                          "Create Onchain Now"
+                        )}
                       </Button>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Navigation Buttons */}
               {currentStep < 6 && (
                 <div className="flex justify-between pt-8 border-t border-gray-200">
                   <Button

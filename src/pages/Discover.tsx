@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal } from 'lucide-react';
 import { ProjectCard } from '../components/project/ProjectCard';
 import { mockProjects, categories } from '../data/mockData';
 import { Button } from '../components/ui/Button';
