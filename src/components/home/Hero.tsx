@@ -1,17 +1,17 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { ArrowRight, Users, Heart, Globe } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Link } from 'react-router-dom';
 
 export const Hero: React.FC = () => {
   const stats = [
-    { icon: DollarSign, value: '$125M+', label: 'Total Raised' },
-    { icon: Users, value: '50K+', label: 'Active Backers' },
-    { icon: TrendingUp, value: '1.2K+', label: 'Successful Projects' },
+    { icon: Heart, value: '$125M+', label: 'Total Raised' },
+    { icon: Users, value: '50K+', label: 'Active Donors' },
+    { icon: Globe, value: '1.2K+', label: 'NGOs Supported' },
   ];
 
   return (
-    <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-green-600 via-blue-600 to-teal-600 overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-full h-full bg-black/20" />
@@ -34,9 +34,9 @@ export const Hero: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
             >
-              Fund the Future of{' '}
+              Support NGOs{' '}
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                NGO Campaigns
+                Making a Difference
               </span>
             </motion.h1>
             
@@ -47,7 +47,7 @@ export const Hero: React.FC = () => {
               className="text-xl text-blue-100 mb-8 leading-relaxed"
             >
               From education to environmental conservation, 
-              back the next generation of sustainable development.
+              back the next generation of sustainable development and humanitarian efforts.
             </motion.p>
             
             <motion.div
@@ -59,9 +59,9 @@ export const Hero: React.FC = () => {
               <Link to="/discover">
                 <Button 
                   size="lg" 
-                  className="bg-blue-600 text-white hover:bg-blue-700 hover:text-white w-full sm:w-auto font-semibold shadow-lg"
+                  className="bg-green-600 text-white hover:bg-green-700 hover:text-white w-full sm:w-auto font-semibold shadow-lg"
                 >
-                  Explore Projects
+                  Explore NGOs
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-purple-700 w-full sm:w-auto font-semibold"
+                  className="border-2 border-white text-white hover:bg-white hover:text-green-700 w-full sm:w-auto font-semibold"
                 >
                   Start Campaign
                 </Button>

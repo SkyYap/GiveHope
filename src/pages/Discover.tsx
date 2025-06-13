@@ -68,10 +68,10 @@ export const Discover: React.FC = () => {
           className="mb-8"
         >
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Discover Projects
+            Discover NGOs
           </h1>
           <p className="text-xl text-gray-600">
-            Explore innovative Web3 projects seeking funding
+            Explore impactful humanitarian projects seeking support
           </p>
         </motion.div>
 
@@ -89,10 +89,10 @@ export const Discover: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search projects, categories, or tags..."
+                  placeholder="Search NGOs, categories, or causes..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
 
@@ -100,7 +100,7 @@ export const Discover: React.FC = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 <option value="all">All Categories</option>
                 {categories.map(category => (
@@ -114,7 +114,7 @@ export const Discover: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 {sortOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -151,7 +151,7 @@ export const Discover: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Funding Stage
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                     <option>All Stages</option>
                     <option>Early Stage (0-25%)</option>
                     <option>Growing (25-75%)</option>
@@ -162,7 +162,7 @@ export const Discover: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Funding Goal
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                     <option>Any Amount</option>
                     <option>Under $100K</option>
                     <option>$100K - $500K</option>
@@ -174,7 +174,7 @@ export const Discover: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Time Remaining
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                     <option>Any Time</option>
                     <option>Less than 7 days</option>
                     <option>7-30 days</option>
@@ -194,7 +194,7 @@ export const Discover: React.FC = () => {
           className="mb-6"
         >
           <p className="text-gray-600">
-            Showing {projects.length} project{projects.length !== 1 ? 's' : ''}
+            Showing {projects.length} NGO{projects.length !== 1 ? 's' : ''}
             {selectedCategory !== 'all' && (
               <span> in {categories.find(c => c.id === selectedCategory)?.name}</span>
             )}
@@ -221,7 +221,7 @@ export const Discover: React.FC = () => {
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-gray-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No projects found</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No NGOs found</h3>
             <p className="text-gray-600">Try adjusting your search criteria or filters</p>
           </motion.div>
         )}
@@ -234,7 +234,7 @@ export const Discover: React.FC = () => {
             className="text-center mt-12"
           >
             <Button size="lg" variant="outline">
-              Load More Projects
+              Load More NGOs
             </Button>
           </motion.div>
         )}

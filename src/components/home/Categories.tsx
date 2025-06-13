@@ -45,7 +45,7 @@ export const Categories: React.FC = () => {
                     {category.name}
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Discover innovative {category.name.toLowerCase()} projects
+                    Discover impactful {category.name.toLowerCase()} initiatives
                   </p>
                 </Card>
               </Link>

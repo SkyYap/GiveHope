@@ -61,11 +61,11 @@ export const CreateCampaign: React.FC = () => {
   const totalSteps = 6;
 
   const steps = [
-    { id: 1, title: 'Basic Info', description: 'Project title and description' },
+    { id: 1, title: 'Basic Info', description: 'NGO details and mission' },
     { id: 2, title: 'Funding', description: 'Goal and duration' },
     { id: 3, title: 'Media', description: 'Images and videos' },
     { id: 4, title: 'Team', description: 'Team members' },
-    { id: 5, title: 'Rewards', description: 'Investment tiers' },
+    { id: 5, title: 'Donation Tiers', description: 'Donation options' },
     { id: 6, title: 'Review', description: 'Final review' },
   ];
 
@@ -250,10 +250,10 @@ export const CreateCampaign: React.FC = () => {
           className="mb-8"
         >
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Create Campaign
+            Create NGO Campaign
           </h1>
           <p className="text-xl text-gray-600">
-            Launch your Web3 project and connect with backers worldwide
+            Launch your humanitarian project and connect with compassionate donors worldwide
           </p>
         </motion.div>
 
@@ -268,13 +268,13 @@ export const CreateCampaign: React.FC = () => {
               <span className="text-sm font-medium text-gray-600">
                 Step {currentStep} of {totalSteps}
               </span>
-              <span className="text-sm font-medium text-blue-600">
+              <span className="text-sm font-medium text-green-600">
                 {Math.round((currentStep / totalSteps) * 100)}% Complete
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
               <div
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-green-500 to-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${(currentStep / totalSteps) * 100}%` }}
               />
             </div>
@@ -323,17 +323,17 @@ export const CreateCampaign: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               {currentStep === 1 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Basic Information</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">NGO Information</h2>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Project Title *
+                      NGO Name / Project Title *
                     </label>
                     <input
-                      {...register('title', { required: 'Project title is required' })}
+                      {...register('title', { required: 'NGO name is required' })}
                       type="text"
-                      placeholder="Enter your project title"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter your NGO or project name"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     {errors.title && (
                       <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
@@ -342,13 +342,13 @@ export const CreateCampaign: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Short Description *
+                      Mission Statement *
                     </label>
                     <input
-                      {...register('shortDescription', { required: 'Short description is required' })}
+                      {...register('shortDescription', { required: 'Mission statement is required' })}
                       type="text"
-                      placeholder="Brief description of your project"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Brief description of your NGO's mission"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     {errors.shortDescription && (
                       <p className="mt-1 text-sm text-red-600">{errors.shortDescription.message}</p>
@@ -361,7 +361,7 @@ export const CreateCampaign: React.FC = () => {
                     </label>
                     <select
                       {...register('category', { required: 'Category is required' })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">Select a category</option>
                       {categories.map((category) => (
@@ -377,13 +377,13 @@ export const CreateCampaign: React.FC = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Project Description *
+                      Detailed Description *
                     </label>
                     <textarea
                       {...register('description', { required: 'Description is required' })}
                       rows={6}
-                      placeholder="Provide a detailed description of your project..."
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Provide a detailed description of your NGO's work, impact, and how the funds will be used..."
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     {errors.description && (
                       <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
@@ -407,7 +407,7 @@ export const CreateCampaign: React.FC = () => {
                       })}
                       type="number"
                       placeholder="1000000"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     {errors.fundingGoal && (
                       <p className="mt-1 text-sm text-red-600">{errors.fundingGoal.message}</p>
@@ -420,7 +420,7 @@ export const CreateCampaign: React.FC = () => {
                     </label>
                     <select
                       {...register('campaignDuration', { required: 'Campaign duration is required' })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">Select duration</option>
                       <option value="30">30 days</option>
@@ -439,7 +439,7 @@ export const CreateCampaign: React.FC = () => {
                       <div>
                         <h4 className="font-medium text-blue-900 mb-1">Platform Fee Information</h4>
                         <p className="text-sm text-blue-700">
-                          Our platform charges a 5% fee on successfully funded campaigns. This covers smart contract deployment, security audits, and platform maintenance.
+                          Our platform charges a 5% fee on successfully funded campaigns. This covers transaction processing, security verification, and platform maintenance.
                         </p>
                       </div>
                     </div>
@@ -449,7 +449,7 @@ export const CreateCampaign: React.FC = () => {
 
               {currentStep === 3 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Project Media</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">NGO Media</h2>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -464,7 +464,7 @@ export const CreateCampaign: React.FC = () => {
                       accept="image/png, image/jpeg, image/jpg"
                     />
                     <div 
-                      className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+                      className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-green-400 transition-colors cursor-pointer"
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {coverImagePreview ? (
@@ -559,7 +559,7 @@ export const CreateCampaign: React.FC = () => {
                             {...register(`teamMembers.${index}.name`, { required: index === 0 ? 'Name is required' : false })}
                             type="text"
                             placeholder="Full name"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                           {Array.isArray(errors.teamMembers) && errors.teamMembers[index]?.name && (
                             <p className="mt-1 text-sm text-red-600">{errors.teamMembers[index]?.name?.message}</p>
@@ -572,8 +572,8 @@ export const CreateCampaign: React.FC = () => {
                           <input
                             {...register(`teamMembers.${index}.role`, { required: index === 0 ? 'Role is required' : false })}
                             type="text"
-                            placeholder="e.g. CEO, CTO, Developer"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="e.g. Director, Program Manager"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                           {Array.isArray(errors.teamMembers) && errors.teamMembers[index]?.role && (
                             <p className="mt-1 text-sm text-red-600">{errors.teamMembers[index]?.role?.message}</p>
@@ -588,7 +588,7 @@ export const CreateCampaign: React.FC = () => {
                           {...register(`teamMembers.${index}.bio`, { required: index === 0 ? 'Bio is required' : false })}
                           rows={3}
                           placeholder="Brief bio and experience..."
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                         {Array.isArray(errors.teamMembers) && errors.teamMembers[index]?.bio && (
                           <p className="mt-1 text-sm text-red-600">{errors.teamMembers[index]?.bio?.message}</p>
@@ -611,7 +611,7 @@ export const CreateCampaign: React.FC = () => {
               {currentStep === 5 && (
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-gray-900">Investment Tiers</h2>
+                    <h2 className="text-2xl font-bold text-gray-900">Donation Tiers</h2>
                     <Button type="button" onClick={addRewardTier} variant="outline">
                       <Plus className="w-4 h-4 mr-2" />
                       Add Tier
@@ -621,7 +621,7 @@ export const CreateCampaign: React.FC = () => {
                   <input
                     type="hidden"
                     {...register('rewardTiers', {
-                      validate: value => (value && value.length > 0) || 'At least one investment tier is required'
+                      validate: value => (value && value.length > 0) || 'At least one donation tier is required'
                     })}
                   />
                   {errors.rewardTiers && typeof errors.rewardTiers.message === 'string' && (
@@ -648,8 +648,8 @@ export const CreateCampaign: React.FC = () => {
                           <input
                             {...register(`rewardTiers.${index}.title`, { required: 'Title is required' })}
                             type="text"
-                            placeholder="e.g. Early Supporter"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="e.g. Basic Supporter"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                           {Array.isArray(errors.rewardTiers) && errors.rewardTiers[index]?.title && (
                             <p className="mt-1 text-sm text-red-600">{errors.rewardTiers[index]?.title?.message}</p>
@@ -663,7 +663,7 @@ export const CreateCampaign: React.FC = () => {
                             {...register(`rewardTiers.${index}.minAmount`, { required: 'Minimum amount is required', min: { value: 1, message: 'Minimum must be at least 1' } })}
                             type="number"
                             placeholder="100"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                           {Array.isArray(errors.rewardTiers) && errors.rewardTiers[index]?.minAmount && (
                             <p className="mt-1 text-sm text-red-600">{errors.rewardTiers[index]?.minAmount?.message}</p>
@@ -677,8 +677,8 @@ export const CreateCampaign: React.FC = () => {
                         <textarea
                           {...register(`rewardTiers.${index}.description`, { required: 'Description is required' })}
                           rows={2}
-                          placeholder="Describe this investment tier..."
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Describe what donors at this tier will receive (e.g., updates, recognition, etc.)..."
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                         {Array.isArray(errors.rewardTiers) && errors.rewardTiers[index]?.description && (
                           <p className="mt-1 text-sm text-red-600">{errors.rewardTiers[index]?.description?.message}</p>
@@ -689,7 +689,7 @@ export const CreateCampaign: React.FC = () => {
 
                   {(!watch('rewardTiers') || watch('rewardTiers')?.length === 0) && (
                     <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-                      <p className="text-gray-500">No investment tiers created yet</p>
+                      <p className="text-gray-500">No donation tiers created yet</p>
                       <Button type="button" onClick={addRewardTier} className="mt-4">
                         Create First Tier
                       </Button>
@@ -744,23 +744,9 @@ export const CreateCampaign: React.FC = () => {
                     </div>
                   )}
 
-                  {/* {!isWritePending && !isConfirming && !isConfirmed && !isWriteError && !isConfirmError && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-start">
-                        <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" />
-                        <div>
-                          <h4 className="font-medium text-green-900 mb-1">Campaign Ready for Review</h4>
-                          <p className="text-sm text-green-700">
-                            Your campaign will be reviewed by our team within 24-48 hours. You'll receive an email once it's approved and live.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )} */}
-
                   <div className="text-center py-8">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      Ready to launch your campaign?
+                      Ready to launch your NGO campaign?
                     </h3>
                     <p className="text-gray-600 mb-6">
                       By submitting, you agree to our terms of service and campaign guidelines.
@@ -777,7 +763,7 @@ export const CreateCampaign: React.FC = () => {
                             Creating...
                           </>
                         ) : (
-                          "Create Onchain Now"
+                          "Launch Campaign"
                         )}
                       </Button>
                     </div>

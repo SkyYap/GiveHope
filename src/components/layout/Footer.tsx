@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Twitter, Github, Disc as Discord, MessageCircle } from 'lucide-react';
+import { Twitter, Github, Disc as Discord, MessageCircle, Heart } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const footerSections = [
     {
       title: 'Platform',
       links: [
-        { name: 'Discover Projects', href: '/discover' },
+        { name: 'Discover NGOs', href: '/discover' },
         { name: 'Create Campaign', href: '/create' },
         { name: 'How it Works', href: '/how-it-works' },
         { name: 'Success Stories', href: '/success-stories' },
@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
       title: 'Resources',
       links: [
         { name: 'Documentation', href: '/docs' },
-        { name: 'API Reference', href: '/api' },
+        { name: 'NGO Guidelines', href: '/guidelines' },
         { name: 'Security', href: '/security' },
         { name: 'Blog', href: '/blog' },
       ],
@@ -48,13 +48,13 @@ export const Footer: React.FC = () => {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">W3</span>
+              <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+                <Heart className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">CrowdFund</span>
+              <span className="text-xl font-bold text-gray-900">GiveHope</span>
             </Link>
             <p className="text-gray-600 text-sm mb-4">
-              The leading Web3 crowdfunding platform for blockchain innovation.
+              The leading platform connecting NGOs with donors worldwide.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
@@ -97,14 +97,14 @@ export const Footer: React.FC = () => {
         <div className="mt-12 pt-8 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-500 text-sm">
-              © 2024 Web3 CrowdFund. All rights reserved.
+              © 2024 GiveHope. All rights reserved.
             </p>
             <div className="mt-4 md:mt-0 flex items-center space-x-6">
-              <span className="text-sm text-gray-500">Powered by</span>
+              <span className="text-sm text-gray-500">Supported by</span>
               <div className="flex items-center space-x-4">
-                <span className="text-sm font-medium text-gray-700">Ethereum</span>
-                <span className="text-sm font-medium text-gray-700">Polygon</span>
-                <span className="text-sm font-medium text-gray-700">Arbitrum</span>
+                <span className="text-sm font-medium text-gray-700">UNICEF</span>
+                <span className="text-sm font-medium text-gray-700">Red Cross</span>
+                <span className="text-sm font-medium text-gray-700">WHO</span>
               </div>
             </div>
           </div>

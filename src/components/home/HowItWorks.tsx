@@ -4,13 +4,13 @@ import { Search, Heart, Rocket, Trophy } from 'lucide-react';
 export const HowItWorks: React.FC = () => {
   const steps = [
     {
-      title: 'Discover Campaigns',
-      description: 'Browse through verified NGO campaigns and find ones that resonate with your interests and goals. Our platform offers a diverse range of causes from education to environmental protection.',
+      title: 'Discover NGOs',
+      description: 'Browse through verified NGO campaigns and find causes that resonate with your values. Our platform offers a diverse range of humanitarian and development initiatives from around the world.',
       image: 'https://images.pexels.com/photos/1194775/pexels-photo-1194775.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
     {
-      title: 'Stake to Donate',
-      description: 'Commit your funds by staking them on a chosen campaign. Your staked assets help secure the campaign\'s funding goal, and the yield generated from your stake is automatically donated to the NGO.',
+      title: 'Donate Transparently',
+      description: 'Make secure donations to your chosen NGOs with complete transparency. Track exactly how your contribution is being used and see the real impact of your generosity.',
       image: 'https://images.pexels.com/photos/8931674/pexels-photo-8931674.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
     {
@@ -20,7 +20,7 @@ export const HowItWorks: React.FC = () => {
     },
     {
       title: 'Community & Impact',
-      description: 'Join a passionate community of supporters. Engage with NGOs, share your impact, and be part of a decentralized movement for social good. Your yield becomes their success.',
+      description: 'Join a passionate community of donors. Engage with NGOs, share your impact, and be part of a global movement for social good. Your donation becomes their success.',
       image: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
   ];
@@ -36,7 +36,7 @@ export const HowItWorks: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
           >
-            How Our Continuous Crowdfunding Works
+            How Our Transparent Donation System Works
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -44,7 +44,7 @@ export const HowItWorks: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-2xl mx-auto"
           >
-            Experience transparent and impactful giving through blockchain-powered yield donations.
+            Experience transparent and impactful giving through our innovative donation tracking system.
           </motion.p>
         </div>
 

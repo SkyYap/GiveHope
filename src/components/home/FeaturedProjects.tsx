@@ -36,7 +36,7 @@ export const FeaturedProjects: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
           >
-            Featured Projects
+            Featured NGOs
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -44,7 +44,7 @@ export const FeaturedProjects: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-2xl mx-auto"
           >
-            Discover the most promising NGO campaigns that are changing the future of sustainable development
+            Discover the most impactful NGO campaigns that are making a real difference in communities worldwide
           </motion.p>
         </div>
 
@@ -84,7 +84,7 @@ export const FeaturedProjects: React.FC = () => {
                 <button
                   key={pageIndex}
                   onClick={() => setCurrentIndex(pageIndex * projectsPerPage)}
-                  className={`w-2 h-2 rounded-full transition-colors ${pageIndex * projectsPerPage === currentIndex ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  className={`w-2 h-2 rounded-full transition-colors ${pageIndex * projectsPerPage === currentIndex ? 'bg-green-600' : 'bg-gray-300'}`}
                 />
               ))}
             </div>

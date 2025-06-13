@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Search, Menu, X } from 'lucide-react';
+import { Search, Menu, X, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
@@ -20,10 +20,10 @@ export const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">W3</span>
+            <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+              <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">CrowdFund</span>
+            <span className="text-xl font-bold text-gray-900">GiveHope</span>
           </Link>
 
           {/* Desktop Navigation */}

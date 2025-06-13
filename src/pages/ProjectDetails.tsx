@@ -27,8 +27,8 @@ import {
 export const ProjectDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState('overview');
-  const [investmentAmount, setInvestmentAmount] = useState('');
-  const [stakeDurationDays, setStakeDurationDays] = useState('365'); // Default to 1 year
+  const [donationAmount, setDonationAmount] = useState('');
+  const [donationDurationDays, setDonationDurationDays] = useState('365'); // Default to 1 year
 
   const project = mockProjects.find(p => p.id === id);
 
@@ -36,7 +36,7 @@ export const ProjectDetails: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Project Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">NGO Not Found</h1>
           <Link to="/discover">
             <Button>Back to Discover</Button>
           </Link>
@@ -52,31 +52,31 @@ export const ProjectDetails: React.FC = () => {
     { id: 'overview', label: 'Overview' },
     { id: 'updates', label: 'Updates' },
     { id: 'comments', label: 'Comments (127)' },
-    { id: 'backers', label: 'Backers' },
+    { id: 'donors', label: 'Donors' },
   ];
 
-  const investmentTiers = [
+  const donationTiers = [
     {
-      title: 'Early Supporter',
+      title: 'Basic Supporter',
       minAmount: 100,
-      description: 'Join the community and get early access',
-      rewards: ['Early access to platform', 'Community discord access', 'Monthly updates'],
+      description: 'Help us make a difference',
+      rewards: ['Monthly email updates', 'Name on donor wall', 'Impact certificate'],
       available: 500,
       claimed: 234,
     },
     {
-      title: 'Power Backer',
+      title: 'Champion Donor',
       minAmount: 500,
       description: 'Significant support with exclusive benefits',
-      rewards: ['All Early Supporter rewards', 'Platform fee discount', 'Governance tokens', 'Beta testing access'],
+      rewards: ['All Basic Supporter benefits', 'Quarterly video updates', 'Personalized thank you letter', 'Digital badge'],
       available: 200,
       claimed: 89,
     },
     {
-      title: 'Strategic Partner',
+      title: 'Visionary Partner',
       minAmount: 2000,
       description: 'Partnership level with direct team access',
-      rewards: ['All previous rewards', 'Direct team consultation', 'Revenue sharing agreement', 'Advisory role opportunity'],
+      rewards: ['All previous benefits', 'Direct consultation with NGO leadership', 'Recognition in annual report', 'Invitation to virtual events'],
       available: 50,
       claimed: 12,
     },
@@ -85,76 +85,74 @@ export const ProjectDetails: React.FC = () => {
   const teamMembers = [
     {
       name: 'Alex Chen',
-      role: 'CEO & Founder',
+      role: 'Executive Director',
       avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
-      bio: 'Former blockchain engineer at major DeFi protocols with 5+ years experience.',
+      bio: 'Former international aid worker with 10+ years experience in humanitarian projects.',
     },
     {
       name: 'Sarah Kim',
-      role: 'CTO',
+      role: 'Program Director',
       avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg',
-      bio: 'Smart contract expert and security researcher with extensive audit experience.',
+      bio: 'Specialist in community development with extensive field experience in Africa and Asia.',
     },
     {
       name: 'Michael Rodriguez',
-      role: 'Head of Product',
+      role: 'Outreach Coordinator',
       avatar: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg',
-      bio: 'Product strategist with successful track record in Web3 UX design.',
+      bio: 'Communications expert focused on building partnerships and donor relations.',
     },
   ];
 
   const milestones = [
     {
-      title: 'MVP Development',
-      description: 'Core protocol development and initial testing',
+      title: 'Initial Outreach',
+      description: 'Community assessment and program design',
       targetDate: new Date('2024-03-15'),
       completed: true,
       fundingRequired: 250000,
     },
     {
-      title: 'Security Audit',
-      description: 'Professional security audit by leading firm',
+      title: 'Resource Acquisition',
+      description: 'Procurement of necessary supplies and equipment',
       targetDate: new Date('2024-04-30'),
       completed: false,
       fundingRequired: 500000,
     },
     {
-      title: 'Mainnet Launch',
-      description: 'Official mainnet deployment and public launch',
+      title: 'Program Launch',
+      description: 'Official launch of community services',
       targetDate: new Date('2024-06-01'),
       completed: false,
       fundingRequired: 750000,
     },
     {
-      title: 'Token Distribution',
-      description: 'Community token distribution and governance setup',
+      title: 'Impact Assessment',
+      description: 'Evaluation of program effectiveness and community feedback',
       targetDate: new Date('2024-07-15'),
       completed: false,
       fundingRequired: 1000000,
     },
   ];
 
-  const APY = 0.30; // 30% annual yield
-  const stake = Number(investmentAmount) || 0;
-  const durationDays = Number(stakeDurationDays) || 0;
+  const impactData: { day: number; impact: number }[] = [];
 
-  const yieldData: { day: number; yield: number }[] = [];
+  impactData.push({ day: 0, impact: 0 }); // Start from day 0 with 0 impact
 
-  yieldData.push({ day: 0, yield: 0 }); // Start from day 0 with 0 yield
+  const donationValue = Number(donationAmount) || 0;
+  const durationDays = Number(donationDurationDays) || 0;
 
   if (durationDays > 0) {
     const interval = 30; // Show points every 30 days (approx. monthly)
     for (let d = interval; d < durationDays; d += interval) {
-      const timeInMonths = d / 30;
-      const yieldAmount = stake * ((1 + APY / 12) ** timeInMonths - 1);
-      yieldData.push({ day: d, yield: Math.round(yieldAmount * 100) / 100 });
+      // Simple linear impact model - can be customized based on NGO's actual impact metrics
+      const impactValue = (donationValue / 100) * (d / 30); // Simplified impact calculation
+      impactData.push({ day: d, impact: Math.round(impactValue * 100) / 100 });
     }
 
     // Ensure the final day is included as a data point
-    if (yieldData[yieldData.length - 1].day !== durationDays) {
-      const timeInMonths = durationDays / 30;
-      const yieldAmount = stake * ((1 + APY / 12) ** timeInMonths - 1);
-      yieldData.push({ day: durationDays, yield: Math.round(yieldAmount * 100) / 100 });
+    if (impactData[impactData.length - 1].day !== durationDays) {
+      const impactValue = (donationValue / 100) * (durationDays / 30);
+      impactData.push({ day: durationDays, impact: Math.round(impactValue * 100) / 100 });
     }
   }
 
@@ -165,7 +163,7 @@ export const ProjectDetails: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link 
             to="/discover" 
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+            className="inline-flex items-center text-gray-600 hover:text-green-600 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
             Back to Discover
@@ -216,10 +214,10 @@ export const ProjectDetails: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <span className="font-medium text-gray-900">{project.creator.name}</span>
                         {project.creator.verified && (
-                          <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                          <CheckCircle2 className="w-4 h-4 text-green-500" />
                         )}
                       </div>
-                      <span className="text-sm text-gray-600">Project Creator</span>
+                      <span className="text-sm text-gray-600">Verified NGO</span>
                     </div>
                   </div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-4">{project.title}</h1>
@@ -227,13 +225,13 @@ export const ProjectDetails: React.FC = () => {
                   
                   {/* Social Links */}
                   <div className="flex space-x-4">
-                    <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
+                    <a href="#" className="text-gray-400 hover:text-green-600 transition-colors">
                       <Globe className="w-5 h-5" />
                     </a>
-                    <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
+                    <a href="#" className="text-gray-400 hover:text-green-600 transition-colors">
                       <Twitter className="w-5 h-5" />
                     </a>
-                    <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
+                    <a href="#" className="text-gray-400 hover:text-green-600 transition-colors">
                       <Github className="w-5 h-5" />
                     </a>
                   </div>
@@ -257,7 +255,7 @@ export const ProjectDetails: React.FC = () => {
                         onClick={() => setActiveTab(tab.id)}
                         className={`py-4 px-1 border-b-2 font-medium text-sm ${
                           activeTab === tab.id
-                            ? 'border-blue-500 text-blue-600'
+                            ? 'border-green-500 text-green-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                         }`}
                       >
@@ -272,12 +270,12 @@ export const ProjectDetails: React.FC = () => {
                     <div className="space-y-8">
                       {/* Description */}
                       <div>
-                        <h3 className="text-xl font-semibold mb-4">About This Project</h3>
+                        <h3 className="text-xl font-semibold mb-4">About This NGO</h3>
                         <p className="text-gray-600 leading-relaxed mb-6">
                           {project.description}
                         </p>
                         <p className="text-gray-600 leading-relaxed">
-                          Our mission is to revolutionize the DeFi space by providing innovative solutions that bridge traditional finance with decentralized protocols. We're building a comprehensive platform that addresses the current limitations in the market while ensuring security, scalability, and user experience remain at the forefront of our development.
+                          Our mission is to create sustainable solutions that address critical humanitarian needs while empowering local communities. We work closely with local partners to ensure our programs are culturally appropriate and build long-term resilience rather than dependency.
                         </p>
                       </div>
 
@@ -294,7 +292,7 @@ export const ProjectDetails: React.FC = () => {
                               />
                               <div>
                                 <h4 className="font-semibold text-gray-900">{member.name}</h4>
-                                <p className="text-blue-600 text-sm font-medium mb-2">{member.role}</p>
+                                <p className="text-green-600 text-sm font-medium mb-2">{member.role}</p>
                                 <p className="text-gray-600 text-sm">{member.bio}</p>
                               </div>
                             </div>
@@ -304,7 +302,7 @@ export const ProjectDetails: React.FC = () => {
 
                       {/* Roadmap */}
                       <div>
-                        <h3 className="text-xl font-semibold mb-4">Roadmap & Milestones</h3>
+                        <h3 className="text-xl font-semibold mb-4">Project Milestones</h3>
                         <div className="space-y-4">
                           {milestones.map((milestone, index) => (
                             <div key={index} className="flex items-start space-x-4">
@@ -325,7 +323,7 @@ export const ProjectDetails: React.FC = () => {
                                   </span>
                                 </div>
                                 <p className="text-gray-600 text-sm mb-2">{milestone.description}</p>
-                                <p className="text-sm font-medium text-blue-600">
+                                <p className="text-sm font-medium text-green-600">
                                   Funding Required: RM{milestone.fundingRequired.toLocaleString()}
                                 </p>
                               </div>
@@ -341,7 +339,7 @@ export const ProjectDetails: React.FC = () => {
                       <div className="text-center py-8">
                         <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">No updates yet</h3>
-                        <p className="text-gray-600">The project team will post updates here as development progresses.</p>
+                        <p className="text-gray-600">The NGO will post updates here as the project progresses.</p>
                       </div>
                     </div>
                   )}
@@ -351,18 +349,18 @@ export const ProjectDetails: React.FC = () => {
                       <div className="text-center py-8">
                         <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Join the discussion</h3>
-                        <p className="text-gray-600">Be the first to comment on this project.</p>
+                        <p className="text-gray-600">Be the first to comment on this NGO's work.</p>
                         <Button className="mt-4">Add Comment</Button>
                       </div>
                     </div>
                   )}
 
-                  {activeTab === 'backers' && (
+                  {activeTab === 'donors' && (
                     <div className="space-y-6">
                       <div className="text-center py-8">
                         <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                          {project.backers} Backers
+                          {project.backers} Donors
                         </h3>
                         <p className="text-gray-600">Join this amazing community of supporters.</p>
                       </div>
@@ -397,7 +395,7 @@ export const ProjectDetails: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 mb-6 text-center">
                     <div>
                       <div className="text-2xl font-bold text-gray-900">{project.backers}</div>
-                      <div className="text-sm text-gray-600">Backers</div>
+                      <div className="text-sm text-gray-600">Donors</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-gray-900">{daysLeft}</div>
@@ -409,12 +407,12 @@ export const ProjectDetails: React.FC = () => {
                     <input
                       type="number"
                       placeholder="Enter amount (RM)"
-                      value={investmentAmount}
-                      onChange={(e) => setInvestmentAmount(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={donationAmount}
+                      onChange={(e) => setDonationAmount(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
-                    <Button size="lg" className="w-full">
-                      Stake for 6 Months
+                    <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
+                      Donate Now
                     </Button>
                     <p className="text-xs text-gray-500 text-center">
                       Secure payment via smart contract
@@ -423,20 +421,20 @@ export const ProjectDetails: React.FC = () => {
                 </Card>
               </motion.div>
 
-              {/* Investment Tiers */}
+              {/* Donation Tiers */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Investment Tiers</h3>
+                  <h3 className="text-lg font-semibold mb-4">Donation Tiers</h3>
                   <div className="space-y-4">
-                    {investmentTiers.map((tier, index) => (
+                    {donationTiers.map((tier, index) => (
                       <div key={index} className="border border-gray-200 rounded-lg p-4">
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-semibold text-gray-900">{tier.title}</h4>
-                          <span className="text-sm font-medium text-blue-600">
+                          <span className="text-sm font-medium text-green-600">
                             RM{tier.minAmount}+
                           </span>
                         </div>
@@ -465,10 +463,10 @@ export const ProjectDetails: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Project Stats</h3>
+                  <h3 className="text-lg font-semibold mb-4">NGO Stats</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Created</span>
+                      <span className="text-gray-600">Founded</span>
                       <span className="font-medium">Dec 15, 2023</span>
                     </div>
                     <div className="flex justify-between">
@@ -490,7 +488,7 @@ export const ProjectDetails: React.FC = () => {
           </div>
         </div>
 
-        {/* Yield Projection Graph */}
+        {/* Impact Projection Graph */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -498,45 +496,45 @@ export const ProjectDetails: React.FC = () => {
           className="mt-8"
         >
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Donation Projection</h3>
+            <h3 className="text-lg font-semibold mb-4">Impact Projection</h3>
             <div className="flex space-x-4 items-end mb-4">
               <div className="flex-1">
-                <label className="block text-sm text-gray-600 mb-1">Stake Amount (RM)</label>
+                <label className="block text-sm text-gray-600 mb-1">Donation Amount (RM)</label>
                 <input
                   type="number"
                   placeholder="Enter amount"
-                  value={investmentAmount}
-                  onChange={(e) => setInvestmentAmount(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={donationAmount}
+                  onChange={(e) => setDonationAmount(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-sm text-gray-600 mb-1">Stake Duration (Days)</label>
+                <label className="block text-sm text-gray-600 mb-1">Time Period (Days)</label>
                 <input
                   type="number"
                   placeholder="Enter days"
-                  value={stakeDurationDays}
-                  onChange={(e) => setStakeDurationDays(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={donationDurationDays}
+                  onChange={(e) => setDonationDurationDays(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
               <div>
-                <Button size="lg" className="w-full">
+                <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
                   Donate Now
                 </Button>
               </div>
             </div>
             <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={yieldData}>
+              <LineChart data={impactData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: 0 }} />
-                <YAxis label={{ value: 'Donation (RM)', angle: -90, position: 'insideLeft', offset: 10 }} />
+                <YAxis label={{ value: 'People Helped', angle: -90, position: 'insideLeft', offset: 10 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="yield" stroke="#2563eb" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="impact" stroke="#22c55e" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
             <p className="text-xs text-gray-500 mt-2">
-              Projected donation over selected duration at 30% APY.
+              Projected impact based on your donation amount and the NGO's efficiency metrics.
             </p>
           </Card>
         </motion.div>
