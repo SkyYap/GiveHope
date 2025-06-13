@@ -10,6 +10,7 @@ import { Discover } from './pages/Discover';
 import { ProjectDetails } from './pages/ProjectDetails';
 import { CreateCampaign } from './pages/CreateCampaign';
 import { About } from './pages/About';
+import { Dashboard } from './pages/Dashboard';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -30,6 +31,7 @@ function App() {
                   <Route path="/project/:id" element={<ProjectDetails />} />
                   <Route path="/create" element={<CreateCampaign />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
                 </Routes>
               </main>
               <Footer />
