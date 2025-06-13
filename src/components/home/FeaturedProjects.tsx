@@ -9,12 +9,15 @@ export const FeaturedProjects: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const featuredProjects = mockProjects.filter(project => project.featured);
   
+  const projectsPerPage = 3;
+  const totalPages = Math.ceil(featuredProjects.length / projectsPerPage);
+
   const nextProject = () => {
-    setCurrentIndex((prev) => (prev + 1) % featuredProjects.length);
+    setCurrentIndex((prev) => (prev + projectsPerPage) % featuredProjects.length);
   };
   
   const prevProject = () => {
-    setCurrentIndex((prev) => (prev - 1 + featuredProjects.length) % featuredProjects.length);
+    setCurrentIndex((prev) => (prev - projectsPerPage + featuredProjects.length) % featuredProjects.length);
   };
 
   useEffect(() => {
@@ -41,7 +44,7 @@ export const FeaturedProjects: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-2xl mx-auto"
           >
-            Discover the most promising Web3 projects that are changing the future of technology
+            Discover the most promising NGO campaigns that are changing the future of sustainable development
           </motion.p>
         </div>
 
@@ -50,7 +53,7 @@ export const FeaturedProjects: React.FC = () => {
           {/* Projects Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="wait">
-              {featuredProjects.slice(currentIndex, currentIndex + 3).map((project, index) => (
+              {featuredProjects.slice(currentIndex, currentIndex + projectsPerPage).map((project, index) => (
                 <motion.div
                   key={`${project.id}-${currentIndex}`}
                   initial={{ opacity: 0, x: 50 }}
@@ -77,13 +80,11 @@ export const FeaturedProjects: React.FC = () => {
             
             {/* Dots Indicator */}
             <div className="flex space-x-2">
-              {featuredProjects.map((_, index) => (
+              {Array.from({ length: totalPages }).map((_, pageIndex) => (
                 <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentIndex ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
+                  key={pageIndex}
+                  onClick={() => setCurrentIndex(pageIndex * projectsPerPage)}
+                  className={`w-2 h-2 rounded-full transition-colors ${pageIndex * projectsPerPage === currentIndex ? 'bg-blue-600' : 'bg-gray-300'}`}
                 />
               ))}
             </div>

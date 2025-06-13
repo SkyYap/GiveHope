@@ -4,24 +4,24 @@ import { Search, Heart, Rocket, Trophy } from 'lucide-react';
 export const HowItWorks: React.FC = () => {
   const steps = [
     {
-      icon: Search,
-      title: 'Discover',
-      description: 'Browse through innovative Web3 projects and find ones that align with your interests and investment goals.',
+      title: 'Discover Campaigns',
+      description: 'Browse through verified NGO campaigns and find ones that resonate with your interests and goals. Our platform offers a diverse range of causes from education to environmental protection.',
+      image: 'https://images.pexels.com/photos/1194775/pexels-photo-1194775.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
     {
-      icon: Heart,
-      title: 'Back',
-      description: 'Support promising projects by contributing funds and becoming part of their journey to success.',
+      title: 'Stake to Donate',
+      description: 'Commit your funds by staking them on a chosen campaign. Your staked assets help secure the campaign\'s funding goal, and the yield generated from your stake is automatically donated to the NGO.',
+      image: 'https://images.pexels.com/photos/8931674/pexels-photo-8931674.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
     {
-      icon: Rocket,
-      title: 'Watch Grow',
-      description: 'Follow project progress, receive updates, and see your backed projects reach their milestones.',
+      title: 'Track Progress',
+      description: 'Monitor the impact of your donation in real-time. Follow project milestones, receive transparent updates from the NGOs, and see how your contribution is making a difference.',
+      image: 'https://images.pexels.com/photos/167682/pexels-photo-167682.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
     {
-      icon: Trophy,
-      title: 'Earn Rewards',
-      description: 'Receive tokens, NFTs, or other rewards as projects successfully launch and grow their communities.',
+      title: 'Community & Impact',
+      description: 'Join a passionate community of supporters. Engage with NGOs, share your impact, and be part of a decentralized movement for social good. Your yield becomes their success.',
+      image: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
   ];
 
@@ -36,7 +36,7 @@ export const HowItWorks: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
           >
-            How It Works
+            How Our Continuous Crowdfunding Works
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -44,38 +44,39 @@ export const HowItWorks: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-2xl mx-auto"
           >
-            Simple steps to start funding the future of Web3 technology
+            Experience transparent and impactful giving through blockchain-powered yield donations.
           </motion.p>
         </div>
 
         {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="space-y-24">
           {steps.map((step, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center"
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true, amount: 0.3 }}
+              className={`flex flex-col lg:flex-row items-center gap-12 ${index % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}
             >
-              {/* Icon */}
-              <div className="relative mb-6">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto">
-                  <step.icon className="w-8 h-8 text-white" />
-                </div>
-                {/* Step Number */}
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  {index + 1}
-                </div>
+              {/* Image */}
+              <div className="lg:w-1/2">
+                <img 
+                  src={step.image}
+                  alt={step.title}
+                  className="rounded-xl shadow-lg w-full h-80 object-cover"
+                />
               </div>
 
               {/* Content */}
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                {step.title}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {step.description}
-              </p>
+              <div className="lg:w-1/2 text-center lg:text-left">
+                <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                  {step.title}
+                </h3>
+                <p className="text-lg text-gray-600 leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>

@@ -15,7 +15,7 @@ export const Categories: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
           >
-            Explore Categories
+            Explore NGOs
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -23,7 +23,7 @@ export const Categories: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-2xl mx-auto"
           >
-            From DeFi innovations to NFT marketplaces, find projects across all Web3 verticals
+            From Education to Environment, find campaigns across all categories
           </motion.p>
         </div>
 

@@ -36,7 +36,7 @@ export const Hero: React.FC = () => {
             >
               Fund the Future of{' '}
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Web3
+                NGO Campaigns
               </span>
             </motion.h1>
             
@@ -46,8 +46,8 @@ export const Hero: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-xl text-blue-100 mb-8 leading-relaxed"
             >
-              Discover and support innovative blockchain projects. From DeFi protocols to NFT platforms, 
-              back the next generation of decentralized technologies.
+              From education to environmental conservation, 
+              back the next generation of sustainable development.
             </motion.p>
             
             <motion.div
@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-purple-800 w-full sm:w-auto font-semibold"
+                  className="border-2 border-white text-white hover:bg-white hover:text-purple-700 w-full sm:w-auto font-semibold"
                 >
                   Start Campaign
                 </Button>

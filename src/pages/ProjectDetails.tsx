@@ -20,11 +20,15 @@ import { mockProjects } from '../data/mockData';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { ProgressBar } from '../components/ui/ProgressBar';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
 
 export const ProjectDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState('overview');
   const [investmentAmount, setInvestmentAmount] = useState('');
+  const [stakeDurationDays, setStakeDurationDays] = useState('365'); // Default to 1 year
 
   const project = mockProjects.find(p => p.id === id);
 
@@ -129,6 +133,30 @@ export const ProjectDetails: React.FC = () => {
       fundingRequired: 1000000,
     },
   ];
+
+  const APY = 0.30; // 30% annual yield
+  const stake = Number(investmentAmount) || 0;
+  const durationDays = Number(stakeDurationDays) || 0;
+
+  const yieldData: { day: number; yield: number }[] = [];
+
+  yieldData.push({ day: 0, yield: 0 }); // Start from day 0 with 0 yield
+
+  if (durationDays > 0) {
+    const interval = 30; // Show points every 30 days (approx. monthly)
+    for (let d = interval; d < durationDays; d += interval) {
+      const timeInMonths = d / 30;
+      const yieldAmount = stake * ((1 + APY / 12) ** timeInMonths - 1);
+      yieldData.push({ day: d, yield: Math.round(yieldAmount * 100) / 100 });
+    }
+
+    // Ensure the final day is included as a data point
+    if (yieldData[yieldData.length - 1].day !== durationDays) {
+      const timeInMonths = durationDays / 30;
+      const yieldAmount = stake * ((1 + APY / 12) ** timeInMonths - 1);
+      yieldData.push({ day: durationDays, yield: Math.round(yieldAmount * 100) / 100 });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -298,7 +326,7 @@ export const ProjectDetails: React.FC = () => {
                                 </div>
                                 <p className="text-gray-600 text-sm mb-2">{milestone.description}</p>
                                 <p className="text-sm font-medium text-blue-600">
-                                  Funding Required: ${milestone.fundingRequired.toLocaleString()}
+                                  Funding Required: RM{milestone.fundingRequired.toLocaleString()}
                                 </p>
                               </div>
                             </div>
@@ -357,10 +385,10 @@ export const ProjectDetails: React.FC = () => {
                 <Card className="p-6">
                   <div className="text-center mb-6">
                     <div className="text-3xl font-bold text-gray-900 mb-2">
-                      ${project.currentFunding.toLocaleString()}
+                      RM {project.currentFunding.toLocaleString()}
                     </div>
                     <div className="text-gray-600">
-                      of ${project.fundingGoal.toLocaleString()} goal
+                      of RM {project.fundingGoal.toLocaleString()} goal
                     </div>
                   </div>
 
@@ -380,13 +408,13 @@ export const ProjectDetails: React.FC = () => {
                   <div className="space-y-3">
                     <input
                       type="number"
-                      placeholder="Enter amount ($)"
+                      placeholder="Enter amount (RM)"
                       value={investmentAmount}
                       onChange={(e) => setInvestmentAmount(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <Button size="lg" className="w-full">
-                      Back This Project
+                      Stake for 6 Months
                     </Button>
                     <p className="text-xs text-gray-500 text-center">
                       Secure payment via smart contract
@@ -409,7 +437,7 @@ export const ProjectDetails: React.FC = () => {
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-semibold text-gray-900">{tier.title}</h4>
                           <span className="text-sm font-medium text-blue-600">
-                            ${tier.minAmount}+
+                            RM{tier.minAmount}+
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mb-3">{tier.description}</p>
@@ -461,6 +489,57 @@ export const ProjectDetails: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Yield Projection Graph */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="mt-8"
+        >
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Donation Projection</h3>
+            <div className="flex space-x-4 items-end mb-4">
+              <div className="flex-1">
+                <label className="block text-sm text-gray-600 mb-1">Stake Amount (RM)</label>
+                <input
+                  type="number"
+                  placeholder="Enter amount"
+                  value={investmentAmount}
+                  onChange={(e) => setInvestmentAmount(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm text-gray-600 mb-1">Stake Duration (Days)</label>
+                <input
+                  type="number"
+                  placeholder="Enter days"
+                  value={stakeDurationDays}
+                  onChange={(e) => setStakeDurationDays(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <Button size="lg" className="w-full">
+                  Donate Now
+                </Button>
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <LineChart data={yieldData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: 0 }} />
+                <YAxis label={{ value: 'Donation (RM)', angle: -90, position: 'insideLeft', offset: 10 }} />
+                <Tooltip />
+                <Line type="monotone" dataKey="yield" stroke="#2563eb" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+            <p className="text-xs text-gray-500 mt-2">
+              Projected donation over selected duration at 30% APY.
+            </p>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );
