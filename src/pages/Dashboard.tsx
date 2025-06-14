@@ -5,7 +5,6 @@ import {
   TrendingUp, 
   Users, 
   Heart, 
-  Calendar,
   DollarSign,
   Target,
   Award,
@@ -18,16 +17,11 @@ import {
   Download,
   Filter,
   Search,
-  ChevronDown,
   Activity,
   Globe,
   Clock,
   CheckCircle2,
-  AlertCircle,
   ArrowUpRight,
-  ArrowDownRight,
-  PieChart,
-  LineChart,
   X,
   ExternalLink
 } from 'lucide-react';
@@ -49,8 +43,12 @@ import {
   PieChart as RechartsPieChart,
   Cell,
   Area,
-  AreaChart
+  AreaChart,
+  Pie
 } from 'recharts';
+import { ValueType, Payload } from 'recharts/types/component/DefaultTooltipContent';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export const Dashboard: React.FC = () => {
   const [userRole, setUserRole] = useState<'donor' | 'ngo'>('donor');
@@ -58,6 +56,8 @@ export const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
+
+  const { isConnected } = useAccount();
 
   // Reset active tab when switching roles
   useEffect(() => {
@@ -276,10 +276,6 @@ export const Dashboard: React.FC = () => {
               </div>
               
               <div className="flex space-x-3">
-                <Button variant="outline" className="flex items-center">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Data
-                </Button>
                 {userRole === 'ngo' && (
                   <Link to="/create">
                     <Button className="flex items-center bg-green-600 hover:bg-green-700">
@@ -288,874 +284,904 @@ export const Dashboard: React.FC = () => {
                     </Button>
                   </Link>
                 )}
+                {userRole === 'donor' && (
+                  <Button className="flex items-center bg-purple-600 hover:bg-purple-700">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Redeem All Expired Stakes
+                  </Button>
+                )}
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Quick Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
-        >
-          {userRole === 'ngo' ? (
-            <>
-              <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100 text-sm font-medium">Total Raised</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={ngoStats.totalRaised} prefix="RM " />
+        {!isConnected ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-10 mt-10"
+          >
+            <img src="/placeholder-connect-wallet.svg" alt="Connect Wallet" className="w-32 h-32 mb-6" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Wallet Not Connected</h2>
+            <p className="text-lg text-gray-600 text-center mb-6">
+              Please connect your crypto wallet to access your dashboard and view your activity.
+            </p>
+            <ConnectButton.Custom>
+              {({ openConnectModal }) => (
+                <Button onClick={openConnectModal} className="bg-blue-600 hover:bg-blue-700">
+                  Connect Wallet
+                </Button>
+              )}
+            </ConnectButton.Custom>
+          </motion.div>
+        ) : (
+          <>
+            {/* Quick Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+            >
+              {userRole === 'ngo' ? (
+                <>
+                  <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-blue-100 text-sm font-medium">Total Raised</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={ngoStats.totalRaised} prefix="RM " />
+                        </div>
+                        <div className="flex items-center mt-2 text-blue-100">
+                          <ArrowUpRight className="w-4 h-4 mr-1" />
+                          <span className="text-sm">+{ngoStats.monthlyGrowth}% this month</span>
+                        </div>
+                      </div>
+                      <DollarSign className="w-8 h-8 text-blue-200" />
                     </div>
-                    <div className="flex items-center mt-2 text-blue-100">
-                      <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">+{ngoStats.monthlyGrowth}% this month</span>
-                    </div>
-                  </div>
-                  <DollarSign className="w-8 h-8 text-blue-200" />
-                </div>
-              </Card>
+                  </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100 text-sm font-medium">Total Donors</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={ngoStats.totalDonors} />
+                  <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-green-100 text-sm font-medium">Total Donors</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={ngoStats.totalDonors} />
+                        </div>
+                        <div className="flex items-center mt-2 text-green-100">
+                          <ArrowUpRight className="w-4 h-4 mr-1" />
+                          <span className="text-sm">+156 this week</span>
+                        </div>
+                      </div>
+                      <Users className="w-8 h-8 text-green-200" />
                     </div>
-                    <div className="flex items-center mt-2 text-green-100">
-                      <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">+156 this week</span>
-                    </div>
-                  </div>
-                  <Users className="w-8 h-8 text-green-200" />
-                </div>
-              </Card>
+                  </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100 text-sm font-medium">Active Campaigns</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={ngoStats.activeCampaigns} />
+                  <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-purple-100 text-sm font-medium">Active Campaigns</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={ngoStats.activeCampaigns} />
+                        </div>
+                        <div className="flex items-center mt-2 text-purple-100">
+                          <Activity className="w-4 h-4 mr-1" />
+                          <span className="text-sm">{ngoStats.completedCampaigns} completed</span>
+                        </div>
+                      </div>
+                      <Heart className="w-8 h-8 text-purple-200" />
                     </div>
-                    <div className="flex items-center mt-2 text-purple-100">
-                      <Activity className="w-4 h-4 mr-1" />
-                      <span className="text-sm">{ngoStats.completedCampaigns} completed</span>
-                    </div>
-                  </div>
-                  <Heart className="w-8 h-8 text-purple-200" />
-                </div>
-              </Card>
+                  </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100 text-sm font-medium">Avg. Donation</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={ngoStats.averageDonation} prefix="RM " />
+                  <Card className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-orange-100 text-sm font-medium">Avg. Donation</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={ngoStats.averageDonation} prefix="RM " />
+                        </div>
+                        <div className="flex items-center mt-2 text-orange-100">
+                          <TrendingUp className="w-4 h-4 mr-1" />
+                          <span className="text-sm">{ngoStats.conversionRate}% conversion</span>
+                        </div>
+                      </div>
+                      <Target className="w-8 h-8 text-orange-200" />
                     </div>
-                    <div className="flex items-center mt-2 text-orange-100">
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                      <span className="text-sm">{ngoStats.conversionRate}% conversion</span>
+                  </Card>
+                </>
+              ) : (
+                <>
+                  <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-blue-100 text-sm font-medium">Total Donated</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={donorStats.totalDonated} prefix="RM " />
+                        </div>
+                        <div className="flex items-center mt-2 text-blue-100">
+                          <ArrowUpRight className="w-4 h-4 mr-1" />
+                          <span className="text-sm">Last: {donorStats.lastDonation}</span>
+                        </div>
+                      </div>
+                      <DollarSign className="w-8 h-8 text-blue-200" />
                     </div>
-                  </div>
-                  <Target className="w-8 h-8 text-orange-200" />
-                </div>
-              </Card>
-            </>
-          ) : (
-            <>
-              <Card className="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100 text-sm font-medium">Total Donated</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={donorStats.totalDonated} prefix="RM " />
-                    </div>
-                    <div className="flex items-center mt-2 text-blue-100">
-                      <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Last: {donorStats.lastDonation}</span>
-                    </div>
-                  </div>
-                  <DollarSign className="w-8 h-8 text-blue-200" />
-                </div>
-              </Card>
+                  </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-red-500 to-red-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-red-100 text-sm font-medium">NGOs Supported</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={donorStats.ngosSupported} />
+                  <Card className="p-6 bg-gradient-to-br from-red-500 to-red-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-red-100 text-sm font-medium">NGOs Supported</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={donorStats.ngosSupported} />
+                        </div>
+                        <div className="flex items-center mt-2 text-red-100">
+                          <Heart className="w-4 h-4 mr-1" />
+                          <span className="text-sm">Favorite: {donorStats.favoriteCategory}</span>
+                        </div>
+                      </div>
+                      <Heart className="w-8 h-8 text-red-200" />
                     </div>
-                    <div className="flex items-center mt-2 text-red-100">
-                      <Heart className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Favorite: {donorStats.favoriteCategory}</span>
-                    </div>
-                  </div>
-                  <Heart className="w-8 h-8 text-red-200" />
-                </div>
-              </Card>
+                  </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100 text-sm font-medium">Impact Points</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={donorStats.impactPoints} />
+                  <Card className="p-6 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-purple-100 text-sm font-medium">Impact Points</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={donorStats.impactPoints} />
+                        </div>
+                        <div className="flex items-center mt-2 text-purple-100">
+                          <Award className="w-4 h-4 mr-1" />
+                          <span className="text-sm">Monthly avg: RM{donorStats.monthlyAverage}</span>
+                        </div>
+                      </div>
+                      <Award className="w-8 h-8 text-purple-200" />
                     </div>
-                    <div className="flex items-center mt-2 text-purple-100">
-                      <Award className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Monthly avg: RM{donorStats.monthlyAverage}</span>
-                    </div>
-                  </div>
-                  <Award className="w-8 h-8 text-purple-200" />
-                </div>
-              </Card>
+                  </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100 text-sm font-medium">Donation Streak</p>
-                    <div className="text-2xl font-bold">
-                      <AnimatedCounter value={donorStats.donationStreak} suffix=" days" />
+                  <Card className="p-6 bg-gradient-to-br from-orange-500 to-orange-600 text-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-orange-100 text-sm font-medium">Donation Streak</p>
+                        <div className="text-2xl font-bold">
+                          <AnimatedCounter value={donorStats.donationStreak} suffix=" days" />
+                        </div>
+                        <div className="flex items-center mt-2 text-orange-100">
+                          <Target className="w-4 h-4 mr-1" />
+                          <span className="text-sm">Keep it up!</span>
+                        </div>
+                      </div>
+                      <Target className="w-8 h-8 text-orange-200" />
                     </div>
-                    <div className="flex items-center mt-2 text-orange-100">
-                      <Target className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Keep it up!</span>
-                    </div>
-                  </div>
-                  <Target className="w-8 h-8 text-orange-200" />
-                </div>
-              </Card>
-            </>
-          )}
-        </motion.div>
+                  </Card>
+                </>
+              )}
+            </motion.div>
 
-        {/* Navigation Tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-8"
-        >
-          <Card className="p-2">
-            <nav className="flex space-x-2">
-              {currentTabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-4 py-3 rounded-lg font-medium text-sm transition-all ${
-                    activeTab === tab.id
-                      ? userRole === 'ngo' 
-                        ? 'bg-green-600 text-white shadow-lg'
-                        : 'bg-blue-600 text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                >
-                  <tab.icon className="w-4 h-4 mr-2" />
-                  {tab.label}
-                </button>
-              ))}
-            </nav>
-          </Card>
-        </motion.div>
-
-        {/* Tab Content */}
-        <motion.div
-          key={`${userRole}-${activeTab}`}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {activeTab === 'overview' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Main Content */}
-              <div className="lg:col-span-2 space-y-8">
-                {/* Donation Trends */}
-                <Card className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {userRole === 'ngo' ? 'Donation Trends' : 'My Donation History'}
-                    </h3>
-                    <select
-                      value={timeRange}
-                      onChange={(e) => setTimeRange(e.target.value)}
-                      className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            {/* Navigation Tabs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-8"
+            >
+              <Card className="p-2">
+                <nav className="flex space-x-2">
+                  {currentTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center px-4 py-3 rounded-lg font-medium text-sm transition-all ${
+                        activeTab === tab.id
+                          ? userRole === 'ngo' 
+                            ? 'bg-green-600 text-white shadow-lg'
+                            : 'bg-blue-600 text-white shadow-lg'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      }`}
                     >
-                      <option value="7d">Last 7 days</option>
-                      <option value="30d">Last 30 days</option>
-                      <option value="90d">Last 90 days</option>
-                      <option value="1y">Last year</option>
-                    </select>
-                  </div>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={donationData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
-                      <YAxis />
-                      <Tooltip 
-                        formatter={(value, name) => [
-                          name === 'amount' ? `RM ${value.toLocaleString()}` : value,
-                          name === 'amount' ? 'Amount' : 'Donors'
-                        ]}
-                        labelFormatter={(label, payload) => {
-                          if (payload && payload[0]) {
-                            return `${label} (${payload[0].payload.date})`;
-                          }
-                          return label;
-                        }}
-                      />
-                      <Area type="monotone" dataKey="amount" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
-                      <Area type="monotone" dataKey="donors" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </Card>
+                      <tab.icon className="w-4 h-4 mr-2" />
+                      {tab.label}
+                    </button>
+                  ))}
+                </nav>
+              </Card>
+            </motion.div>
 
-                {/* Campaign Performance / My Donations */}
-                {userRole === 'ngo' ? (
-                  <Card className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Campaign Performance</h3>
-                    <div className="space-y-4">
-                      {campaigns.map((campaign) => {
-                        const progress = (campaign.raised / campaign.goal) * 100;
-                        return (
-                          <div key={campaign.id} className="border border-gray-200 rounded-lg p-4">
-                            <div className="flex items-center space-x-4">
-                              <img
-                                src={campaign.image}
-                                alt={campaign.title}
-                                className="w-16 h-16 rounded-lg object-cover"
-                              />
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between mb-2">
-                                  <h4 className="font-semibold text-gray-900">{campaign.title}</h4>
-                                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                    campaign.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                                  }`}>
-                                    {campaign.status}
-                                  </span>
-                                </div>
-                                <ProgressBar progress={progress} className="mb-2" />
-                                <div className="flex items-center justify-between text-sm text-gray-600">
-                                  <span>RM {campaign.raised.toLocaleString()} of RM {campaign.goal.toLocaleString()}</span>
-                                  <span>{campaign.donors} donors • {campaign.daysLeft} days left</span>
+            {/* Tab Content */}
+            <motion.div
+              key={`${userRole}-${activeTab}`}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              {activeTab === 'overview' && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Main Content */}
+                  <div className="lg:col-span-2 space-y-8">
+                    {/* Donation Trends */}
+                    <Card className="p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          {userRole === 'ngo' ? 'Donation Trends' : 'My Donation History'}
+                        </h3>
+                        <select
+                          value={timeRange}
+                          onChange={(e) => setTimeRange(e.target.value)}
+                          className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        >
+                          <option value="7d">Last 7 days</option>
+                          <option value="30d">Last 30 days</option>
+                          <option value="90d">Last 90 days</option>
+                          <option value="1y">Last year</option>
+                        </select>
+                      </div>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={donationData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="period" />
+                          <YAxis />
+                          <Tooltip 
+                            formatter={(value: ValueType, name: "amount" | "donors") => [
+                              name === 'amount' ? `RM ${value.toLocaleString()}` : value,
+                              name === 'amount' ? 'Amount' : 'Donors'
+                            ]}
+                            labelFormatter={(label: any, payload: Payload<ValueType, "amount" | "donors">[]) => {
+                              if (payload && payload[0]) {
+                                return `${label} (${payload[0].payload.date})`;
+                              }
+                              return label;
+                            }}
+                          />
+                          <Area type="monotone" dataKey="amount" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
+                          <Area type="monotone" dataKey="donors" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </Card>
+
+                    {/* Campaign Performance / My Donations */}
+                    {userRole === 'ngo' ? (
+                      <Card className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-6">Campaign Performance</h3>
+                        <div className="space-y-4">
+                          {campaigns.map((campaign) => {
+                            const progress = (campaign.raised / campaign.goal) * 100;
+                            return (
+                              <div key={campaign.id} className="border border-gray-200 rounded-lg p-4">
+                                <div className="flex items-center space-x-4">
+                                  <img
+                                    src={campaign.image}
+                                    alt={campaign.title}
+                                    className="w-16 h-16 rounded-lg object-cover"
+                                  />
+                                  <div className="flex-1">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <h4 className="font-semibold text-gray-900">{campaign.title}</h4>
+                                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                        campaign.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                      }`}>
+                                        {campaign.status}
+                                      </span>
+                                    </div>
+                                    <ProgressBar progress={progress} className="mb-2" />
+                                    <div className="flex items-center justify-between text-sm text-gray-600">
+                                      <span>RM {campaign.raised.toLocaleString()} of RM {campaign.goal.toLocaleString()}</span>
+                                      <span>{campaign.donors} donors • {campaign.daysLeft} days left</span>
+                                    </div>
+                                  </div>
+                                  <div className="flex space-x-2">
+                                    <Button variant="ghost" size="sm">
+                                      <Eye className="w-4 h-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="sm">
+                                      <Edit className="w-4 h-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="sm">
+                                      <Share2 className="w-4 h-4" />
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
-                              <div className="flex space-x-2">
-                                <Button variant="ghost" size="sm">
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  <Share2 className="w-4 h-4" />
-                                </Button>
+                            );
+                          })}
+                        </div>
+                      </Card>
+                    ) : (
+                      <Card className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-6">Recent Donations</h3>
+                        <div className="space-y-4">
+                          {myDonationHistory.slice(0, 3).map((donation) => (
+                            <div key={donation.id} className="border border-gray-200 rounded-lg p-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-gray-900">{donation.ngo}</h4>
+                                <span className="text-lg font-bold text-green-600">
+                                  RM {donation.amount}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-2">{donation.impact}</p>
+                              <div className="flex items-center justify-between text-sm text-gray-500">
+                                <span>{donation.date}</span>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  donation.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {donation.status}
+                                </span>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </Card>
-                ) : (
-                  <Card className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Recent Donations</h3>
-                    <div className="space-y-4">
-                      {myDonationHistory.slice(0, 3).map((donation) => (
-                        <div key={donation.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-900">{donation.ngo}</h4>
-                            <span className="text-lg font-bold text-green-600">
-                              RM {donation.amount}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600 mb-2">{donation.impact}</p>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span>{donation.date}</span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              donation.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {donation.status}
-                            </span>
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </Card>
-                )}
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Recent Activity */}
-                <Card className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => handleActivityClick(recentDonations[0])}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-4">
-                    {recentDonations.slice(0, 5).map((donation) => (
-                      <div 
-                        key={donation.id} 
-                        className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-                        onClick={() => handleActivityClick(donation)}
-                      >
-                        <img
-                          src={donation.avatar}
-                          alt={donation.donor}
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {donation.donor}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {donation.campaign}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-green-600">
-                            +RM {donation.amount}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {donation.time}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                {/* Impact Metrics */}
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    {userRole === 'ngo' ? 'Impact Overview' : 'Your Impact'}
-                  </h3>
-                  <div className="space-y-4">
-                    {(userRole === 'ngo' ? impactMetrics : donorImpactMetrics).map((metric, index) => (
-                      <div key={index} className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-lg ${metric.bg} flex items-center justify-center`}>
-                          <metric.icon className={`w-5 h-5 ${metric.color}`} />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm text-gray-600">{metric.label}</p>
-                          <p className="text-lg font-semibold text-gray-900">
-                            <AnimatedCounter 
-                              value={metric.value} 
-                              suffix={metric.suffix || ''} 
-                            />
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                  <div className="space-y-3">
-                    {userRole === 'ngo' ? (
-                      <>
-                        <Link to="/create">
-                          <Button className="w-full justify-start bg-green-600 hover:bg-green-700">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Create New Campaign
-                          </Button>
-                        </Link>
-                        <Button variant="outline" className="w-full justify-start">
-                          <Bell className="w-4 h-4 mr-2" />
-                          Send Update to Donors
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <Settings className="w-4 h-4 mr-2" />
-                          Account Settings
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Link to="/discover">
-                          <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700">
-                            <Search className="w-4 h-4 mr-2" />
-                            Find New NGOs
-                          </Button>
-                        </Link>
-                        <Button variant="outline" className="w-full justify-start">
-                          <Bell className="w-4 h-4 mr-2" />
-                          Notification Settings
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start">
-                          <Settings className="w-4 h-4 mr-2" />
-                          Account Settings
-                        </Button>
-                      </>
+                      </Card>
                     )}
                   </div>
-                </Card>
-              </div>
-            </div>
-          )}
 
-          {/* Other tabs content */}
-          {activeTab === 'donations' && userRole === 'donor' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">My Donation History</h2>
-                <div className="flex space-x-3">
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </Button>
-                  <Button variant="outline">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
+                  {/* Sidebar */}
+                  <div className="space-y-6">
+                    {/* Recent Activity */}
+                    <Card className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleActivityClick(recentDonations[0])}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="space-y-4">
+                        {recentDonations.slice(0, 5).map((donation) => (
+                          <div 
+                            key={donation.id} 
+                            className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                            onClick={() => handleActivityClick(donation)}
+                          >
+                            <img
+                              src={donation.avatar}
+                              alt={donation.donor}
+                              className="w-10 h-10 rounded-full"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {donation.donor}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {donation.campaign}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-semibold text-green-600">
+                                +RM {donation.amount}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {donation.time}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+
+                    {/* Impact Metrics */}
+                    <Card className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        {userRole === 'ngo' ? 'Impact Overview' : 'Your Impact'}
+                      </h3>
+                      <div className="space-y-4">
+                        {(userRole === 'ngo' ? impactMetrics : donorImpactMetrics).map((metric, index) => (
+                          <div key={index} className="flex items-center space-x-3">
+                            <div className={`w-10 h-10 rounded-lg ${metric.bg} flex items-center justify-center`}>
+                              <metric.icon className={`w-5 h-5 ${metric.color}`} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm text-gray-600">{metric.label}</p>
+                              <p className="text-lg font-semibold text-gray-900">
+                                <AnimatedCounter 
+                                  value={metric.value} 
+                                  suffix={metric.suffix || ''} 
+                                />
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+
+                    {/* Quick Actions */}
+                    <Card className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                      <div className="space-y-3">
+                        {userRole === 'ngo' ? (
+                          <>
+                            <Link to="/create">
+                              <Button className="w-full justify-start bg-green-600 hover:bg-green-700">
+                                <Plus className="w-4 h-4 mr-2" />
+                                Create New Campaign
+                              </Button>
+                            </Link>
+                            <Button variant="outline" className="w-full justify-start">
+                              <Bell className="w-4 h-4 mr-2" />
+                              Send Update to Donors
+                            </Button>
+                            <Button variant="outline" className="w-full justify-start">
+                              <Settings className="w-4 h-4 mr-2" />
+                              Account Settings
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Link to="/discover">
+                              <Button className="w-full justify-start bg-blue-600 hover:bg-blue-700">
+                                <Search className="w-4 h-4 mr-2" />
+                                Find New NGOs
+                              </Button>
+                            </Link>
+                            <Button variant="outline" className="w-full justify-start">
+                              <Bell className="w-4 h-4 mr-2" />
+                              Notification Settings
+                            </Button>
+                            <Button variant="outline" className="w-full justify-start">
+                              <Settings className="w-4 h-4 mr-2" />
+                              Account Settings
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </Card>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <Card className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          NGO
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Impact
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {myDonationHistory.map((donation) => (
-                        <tr key={donation.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-medium text-gray-900">
-                              {donation.ngo}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                            RM {donation.amount.toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {donation.date}
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
-                            {donation.impact}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                              {donation.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </div>
-          )}
-
-          {activeTab === 'ngos' && userRole === 'donor' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Supported NGOs</h2>
-                <Link to="/discover">
-                  <Button className="bg-blue-600 hover:bg-blue-700">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Support New NGO
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {supportedNGOs.map((ngo) => (
-                  <Card key={ngo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="relative h-48">
-                      <img
-                        src={ngo.image}
-                        alt={ngo.name}
-                        className="w-full h-full object-cover"
-                      />
+              {/* Other tabs content */}
+              {activeTab === 'donations' && userRole === 'donor' && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-900">My Donation History</h2>
+                    <div className="flex space-x-3">
+                      <Button variant="outline">
+                        <Download className="w-4 h-4 mr-2" />
+                        Export
+                      </Button>
+                      <Button variant="outline">
+                        <Filter className="w-4 h-4 mr-2" />
+                        Filter
+                      </Button>
                     </div>
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{ngo.name}</h3>
-                      <div className="space-y-2 text-sm text-gray-600 mb-4">
-                        <div className="flex justify-between">
-                          <span>Total Donated:</span>
-                          <span className="font-semibold text-green-600">RM {ngo.totalDonated}</span>
+                  </div>
+
+                  <Card className="overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              NGO
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Amount
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Date
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Impact
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {myDonationHistory.map((donation) => (
+                            <tr key={donation.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="text-sm font-medium text-gray-900">
+                                  {donation.ngo}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                                RM {donation.amount.toLocaleString()}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {donation.date}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
+                                {donation.impact}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                                  {donation.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                </div>
+              )}
+
+              {activeTab === 'ngos' && userRole === 'donor' && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-900">Supported NGOs</h2>
+                    <Link to="/discover">
+                      <Button className="bg-blue-600 hover:bg-blue-700">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Support New NGO
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {supportedNGOs.map((ngo) => (
+                      <Card key={ngo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                        <div className="relative h-48">
+                          <img
+                            src={ngo.image}
+                            alt={ngo.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <div className="flex justify-between">
-                          <span>Campaigns Supported:</span>
-                          <span className="font-medium">{ngo.campaigns}</span>
+                        <div className="p-6">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-3">{ngo.name}</h3>
+                          <div className="space-y-2 text-sm text-gray-600 mb-4">
+                            <div className="flex justify-between">
+                              <span>Total Donated:</span>
+                              <span className="font-semibold text-green-600">RM {ngo.totalDonated}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Campaigns Supported:</span>
+                              <span className="font-medium">{ngo.campaigns}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Last Donation:</span>
+                              <span className="font-medium">{ngo.lastDonation}</span>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" className="flex-1">
+                              <Eye className="w-4 h-4 mr-1" />
+                              View
+                            </Button>
+                            <Button variant="outline" size="sm" className="flex-1">
+                              <ExternalLink className="w-4 h-4 mr-1" />
+                              Visit
+                            </Button>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Last Donation:</span>
-                          <span className="font-medium">{ngo.lastDonation}</span>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* NGO specific tabs */}
+              {userRole === 'ngo' && activeTab === 'campaigns' && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-900">My Campaigns</h2>
+                    <div className="flex space-x-3">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <input
+                          type="text"
+                          placeholder="Search campaigns..."
+                          className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        />
+                      </div>
+                      <Button variant="outline">
+                        <Filter className="w-4 h-4 mr-2" />
+                        Filter
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {campaigns.map((campaign) => {
+                      const progress = (campaign.raised / campaign.goal) * 100;
+                      return (
+                        <Card key={campaign.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                          <div className="relative h-48">
+                            <img
+                              src={campaign.image}
+                              alt={campaign.title}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-3 left-3">
+                              <span className="px-2 py-1 text-xs font-medium bg-white/90 text-gray-800 rounded-full">
+                                {campaign.category}
+                              </span>
+                            </div>
+                            <div className="absolute top-3 right-3">
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                campaign.status === 'active' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
+                              }`}>
+                                {campaign.status}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-3">{campaign.title}</h3>
+                            <ProgressBar progress={progress} className="mb-3" />
+                            <div className="flex justify-between text-sm text-gray-600 mb-4">
+                              <span>RM {campaign.raised.toLocaleString()}</span>
+                              <span>{progress.toFixed(0)}% funded</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-gray-600 mb-4">
+                              <span>{campaign.donors} donors</span>
+                              <span>{campaign.daysLeft} days left</span>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button variant="outline" size="sm" className="flex-1">
+                                <Eye className="w-4 h-4 mr-1" />
+                                View
+                              </Button>
+                              <Button variant="outline" size="sm" className="flex-1">
+                                <Edit className="w-4 h-4 mr-1" />
+                                Edit
+                              </Button>
+                              <Button variant="outline" size="sm">
+                                <Share2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {userRole === 'ngo' && activeTab === 'analytics' && (
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Donation Categories */}
+                    <Card className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Donations by Category</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <RechartsPieChart>
+                          <Pie
+                            data={categoryData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            dataKey="value"
+                            label={({ name, value }: { name: string; value: number }) => `${name}: ${value}%`}
+                          >
+                            {categoryData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </RechartsPieChart>
+                      </ResponsiveContainer>
+                    </Card>
+
+                    {/* Monthly Comparison */}
+                    <Card className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Monthly Comparison</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={donationData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="period" />
+                          <YAxis />
+                          <Tooltip formatter={(value) => [`RM ${value.toLocaleString()}`, 'Amount']} />
+                          <Bar dataKey="amount" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </Card>
+                  </div>
+
+                  {/* Detailed Analytics */}
+                  <Card className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-6">Detailed Analytics</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-blue-600 mb-2">
+                          <AnimatedCounter value={ngoStats.conversionRate} suffix="%" />
+                        </div>
+                        <p className="text-gray-600">Conversion Rate</p>
+                        <div className="flex items-center justify-center mt-2 text-green-600">
+                          <ArrowUpRight className="w-4 h-4 mr-1" />
+                          <span className="text-sm">+2.3% vs last month</span>
                         </div>
                       </div>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" className="flex-1">
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                        <Button variant="outline" size="sm" className="flex-1">
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Visit
-                        </Button>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-green-600 mb-2">
+                          <AnimatedCounter value={ngoStats.averageDonation} prefix="RM " />
+                        </div>
+                        <p className="text-gray-600">Average Donation</p>
+                        <div className="flex items-center justify-center mt-2 text-green-600">
+                          <ArrowUpRight className="w-4 h-4 mr-1" />
+                          <span className="text-sm">+15.7% vs last month</span>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-purple-600 mb-2">
+                          <AnimatedCounter value={ngoStats.totalImpact} />
+                        </div>
+                        <p className="text-gray-600">People Impacted</p>
+                        <div className="flex items-center justify-center mt-2 text-green-600">
+                          <ArrowUpRight className="w-4 h-4 mr-1" />
+                          <span className="text-sm">+8.9% vs last month</span>
+                        </div>
                       </div>
                     </div>
                   </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* NGO specific tabs */}
-          {userRole === 'ngo' && activeTab === 'campaigns' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">My Campaigns</h2>
-                <div className="flex space-x-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search campaigns..."
-                      className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <Button variant="outline">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
                 </div>
-              </div>
+              )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {campaigns.map((campaign) => {
-                  const progress = (campaign.raised / campaign.goal) * 100;
-                  return (
-                    <Card key={campaign.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                      <div className="relative h-48">
-                        <img
-                          src={campaign.image}
-                          alt={campaign.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-3 left-3">
-                          <span className="px-2 py-1 text-xs font-medium bg-white/90 text-gray-800 rounded-full">
-                            {campaign.category}
-                          </span>
+              {userRole === 'ngo' && activeTab === 'donations' && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-gray-900">Donation History</h2>
+                    <div className="flex space-x-3">
+                      <Button variant="outline">
+                        <Download className="w-4 h-4 mr-2" />
+                        Export
+                      </Button>
+                      <Button variant="outline">
+                        <Filter className="w-4 h-4 mr-2" />
+                        Filter
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Card className="overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Donor
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Campaign
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Amount
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Date
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {recentDonations.map((donation) => (
+                            <tr key={donation.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <img
+                                    src={donation.avatar}
+                                    alt={donation.donor}
+                                    className="w-8 h-8 rounded-full mr-3"
+                                  />
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {donation.donor}
+                                  </span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {donation.campaign}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                                RM {donation.amount.toLocaleString()}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                {donation.time}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                  donation.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {donation.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                </div>
+              )}
+
+              {activeTab === 'impact' && (
+                <div className="space-y-8">
+                  <div className="text-center">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                      {userRole === 'ngo' ? 'Your Impact Dashboard' : 'Your Personal Impact'}
+                    </h2>
+                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                      {userRole === 'ngo' 
+                        ? 'See the real-world difference your campaigns are making in communities worldwide'
+                        : 'Track the positive change you\'re creating through your donations'
+                      }
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {(userRole === 'ngo' ? impactMetrics : donorImpactMetrics).map((metric, index) => (
+                      <Card key={index} className="p-6 text-center">
+                        <div className={`w-16 h-16 rounded-full ${metric.bg} flex items-center justify-center mx-auto mb-4`}>
+                          <metric.icon className={`w-8 h-8 ${metric.color}`} />
                         </div>
-                        <div className="absolute top-3 right-3">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            campaign.status === 'active' ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'
-                          }`}>
-                            {campaign.status}
-                          </span>
+                        <div className="text-3xl font-bold text-gray-900 mb-2">
+                          <AnimatedCounter 
+                            value={metric.value} 
+                            suffix={metric.suffix || ''} 
+                          />
                         </div>
-                      </div>
-                      <div className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">{campaign.title}</h3>
-                        <ProgressBar progress={progress} className="mb-3" />
-                        <div className="flex justify-between text-sm text-gray-600 mb-4">
-                          <span>RM {campaign.raised.toLocaleString()}</span>
-                          <span>{progress.toFixed(0)}% funded</span>
+                        <p className="text-gray-600">{metric.label}</p>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <Card className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Impact Over Time</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <RechartsLineChart data={donationData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="period" />
+                          <YAxis />
+                          <Tooltip />
+                          <Line 
+                            type="monotone" 
+                            dataKey="donors" 
+                            stroke="#22c55e" 
+                            strokeWidth={3}
+                            dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
+                          />
+                        </RechartsLineChart>
+                      </ResponsiveContainer>
+                    </Card>
+
+                    <Card className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-6">Success Stories</h3>
+                      <div className="space-y-4">
+                        <div className="border-l-4 border-green-500 pl-4">
+                          <h4 className="font-semibold text-gray-900">Clean Water Access</h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {userRole === 'ngo' 
+                              ? 'Provided clean water access to 5,420 people across 12 villages in rural areas.'
+                              : 'Your donations helped provide clean water access to 234 people in rural communities.'
+                            }
+                          </p>
+                          <span className="text-xs text-green-600 font-medium">Completed • 3 months ago</span>
                         </div>
-                        <div className="flex justify-between text-sm text-gray-600 mb-4">
-                          <span>{campaign.donors} donors</span>
-                          <span>{campaign.daysLeft} days left</span>
+                        <div className="border-l-4 border-blue-500 pl-4">
+                          <h4 className="font-semibold text-gray-900">Education Initiative</h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {userRole === 'ngo'
+                              ? 'Built 3 schools and provided education materials for 2,100 children.'
+                              : 'Contributed to building schools and providing education for 89 children.'
+                            }
+                          </p>
+                          <span className="text-xs text-blue-600 font-medium">Completed • 6 months ago</span>
                         </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <Eye className="w-4 h-4 mr-1" />
-                            View
-                          </Button>
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <Edit className="w-4 h-4 mr-1" />
-                            Edit
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Share2 className="w-4 h-4" />
-                          </Button>
+                        <div className="border-l-4 border-purple-500 pl-4">
+                          <h4 className="font-semibold text-gray-900">Healthcare Program</h4>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {userRole === 'ngo'
+                              ? 'Established mobile clinics serving 8,900 people in remote communities.'
+                              : 'Supported mobile clinics that served 156 people in remote areas.'
+                            }
+                          </p>
+                          <span className="text-xs text-purple-600 font-medium">Ongoing • Started 2 months ago</span>
                         </div>
                       </div>
                     </Card>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {userRole === 'ngo' && activeTab === 'analytics' && (
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Donation Categories */}
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Donations by Category</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <RechartsPieChart>
-                      <Pie
-                        data={categoryData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}%`}
-                      >
-                        {categoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </RechartsPieChart>
-                  </ResponsiveContainer>
-                </Card>
-
-                {/* Monthly Comparison */}
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Monthly Comparison</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={donationData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
-                      <YAxis />
-                      <Tooltip formatter={(value) => [`RM ${value.toLocaleString()}`, 'Amount']} />
-                      <Bar dataKey="amount" fill="#22c55e" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-              </div>
-
-              {/* Detailed Analytics */}
-              <Card className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">Detailed Analytics</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600 mb-2">
-                      <AnimatedCounter value={ngoStats.conversionRate} suffix="%" />
-                    </div>
-                    <p className="text-gray-600">Conversion Rate</p>
-                    <div className="flex items-center justify-center mt-2 text-green-600">
-                      <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">+2.3% vs last month</span>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600 mb-2">
-                      <AnimatedCounter value={ngoStats.averageDonation} prefix="RM " />
-                    </div>
-                    <p className="text-gray-600">Average Donation</p>
-                    <div className="flex items-center justify-center mt-2 text-green-600">
-                      <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">+15.7% vs last month</span>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600 mb-2">
-                      <AnimatedCounter value={ngoStats.totalImpact} />
-                    </div>
-                    <p className="text-gray-600">People Impacted</p>
-                    <div className="flex items-center justify-center mt-2 text-green-600">
-                      <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">+8.9% vs last month</span>
-                    </div>
                   </div>
                 </div>
-              </Card>
-            </div>
-          )}
-
-          {userRole === 'ngo' && activeTab === 'donations' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Donation History</h2>
-                <div className="flex space-x-3">
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </Button>
-                  <Button variant="outline">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
-                </div>
-              </div>
-
-              <Card className="overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Donor
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Campaign
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {recentDonations.map((donation) => (
-                        <tr key={donation.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <img
-                                src={donation.avatar}
-                                alt={donation.donor}
-                                className="w-8 h-8 rounded-full mr-3"
-                              />
-                              <span className="text-sm font-medium text-gray-900">
-                                {donation.donor}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {donation.campaign}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                            RM {donation.amount.toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {donation.time}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              donation.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {donation.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Card>
-            </div>
-          )}
-
-          {activeTab === 'impact' && (
-            <div className="space-y-8">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  {userRole === 'ngo' ? 'Your Impact Dashboard' : 'Your Personal Impact'}
-                </h2>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  {userRole === 'ngo' 
-                    ? 'See the real-world difference your campaigns are making in communities worldwide'
-                    : 'Track the positive change you\'re creating through your donations'
-                  }
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {(userRole === 'ngo' ? impactMetrics : donorImpactMetrics).map((metric, index) => (
-                  <Card key={index} className="p-6 text-center">
-                    <div className={`w-16 h-16 rounded-full ${metric.bg} flex items-center justify-center mx-auto mb-4`}>
-                      <metric.icon className={`w-8 h-8 ${metric.color}`} />
-                    </div>
-                    <div className="text-3xl font-bold text-gray-900 mb-2">
-                      <AnimatedCounter 
-                        value={metric.value} 
-                        suffix={metric.suffix || ''} 
-                      />
-                    </div>
-                    <p className="text-gray-600">{metric.label}</p>
-                  </Card>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Impact Over Time</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <RechartsLineChart data={donationData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="period" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line 
-                        type="monotone" 
-                        dataKey="donors" 
-                        stroke="#22c55e" 
-                        strokeWidth={3}
-                        dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
-                      />
-                    </RechartsLineChart>
-                  </ResponsiveContainer>
-                </Card>
-
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Success Stories</h3>
-                  <div className="space-y-4">
-                    <div className="border-l-4 border-green-500 pl-4">
-                      <h4 className="font-semibold text-gray-900">Clean Water Access</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {userRole === 'ngo' 
-                          ? 'Provided clean water access to 5,420 people across 12 villages in rural areas.'
-                          : 'Your donations helped provide clean water access to 234 people in rural communities.'
-                        }
-                      </p>
-                      <span className="text-xs text-green-600 font-medium">Completed • 3 months ago</span>
-                    </div>
-                    <div className="border-l-4 border-blue-500 pl-4">
-                      <h4 className="font-semibold text-gray-900">Education Initiative</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {userRole === 'ngo'
-                          ? 'Built 3 schools and provided education materials for 2,100 children.'
-                          : 'Contributed to building schools and providing education for 89 children.'
-                        }
-                      </p>
-                      <span className="text-xs text-blue-600 font-medium">Completed • 6 months ago</span>
-                    </div>
-                    <div className="border-l-4 border-purple-500 pl-4">
-                      <h4 className="font-semibold text-gray-900">Healthcare Program</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {userRole === 'ngo'
-                          ? 'Established mobile clinics serving 8,900 people in remote communities.'
-                          : 'Supported mobile clinics that served 156 people in remote areas.'
-                        }
-                      </p>
-                      <span className="text-xs text-purple-600 font-medium">Ongoing • Started 2 months ago</span>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </div>
-          )}
-        </motion.div>
+              )}
+            </motion.div>
+          </>
+        )}
 
         {/* Activity Detail Modal */}
         {showActivityModal && selectedActivity && (

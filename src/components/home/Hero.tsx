@@ -70,7 +70,7 @@ export const Hero: React.FC = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-green-700 w-full sm:w-auto font-semibold"
+                  className="border-2 border-white text-white hover:bg-white hover:text-green-800 w-full sm:w-auto font-semibold"
                 >
                   Start Campaign
                 </Button>
