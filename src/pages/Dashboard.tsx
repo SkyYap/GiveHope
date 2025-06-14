@@ -29,10 +29,7 @@ import {
   PieChart,
   LineChart,
   X,
-  ExternalLink,
-  MessageSquare,
-  Bookmark,
-  TrendingDown
+  ExternalLink
 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -52,64 +49,55 @@ import {
   PieChart as RechartsPieChart,
   Cell,
   Area,
-  AreaChart,
-  Pie
+  AreaChart
 } from 'recharts';
 
 export const Dashboard: React.FC = () => {
+  const [userRole, setUserRole] = useState<'donor' | 'ngo'>('donor');
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState('30d');
-  const [userRole, setUserRole] = useState<'ngo' | 'donor'>('ngo');
-  const [selectedActivity, setSelectedActivity] = useState<any>(null);
   const [showActivityModal, setShowActivityModal] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState<any>(null);
 
-  // Generate dynamic data based on time range
-  const generateTimeRangeData = (range: string) => {
-    const data = [];
-    let labels = [];
-    let dataPoints = 0;
+  // Reset active tab when switching roles
+  useEffect(() => {
+    setActiveTab('overview');
+  }, [userRole]);
 
-    switch (range) {
-      case '7d':
-        labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        dataPoints = 7;
-        break;
-      case '30d':
-        labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-        dataPoints = 4;
-        break;
-      case '90d':
-        labels = ['Month 1', 'Month 2', 'Month 3'];
-        dataPoints = 3;
-        break;
-      case '1y':
-        labels = ['Q1', 'Q2', 'Q3', 'Q4'];
-        dataPoints = 4;
-        break;
-      default:
-        labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-        dataPoints = 4;
-    }
-
-    for (let i = 0; i < dataPoints; i++) {
-      const baseAmount = 45000 + Math.random() * 30000;
-      const baseDonors = 120 + Math.random() * 80;
-      data.push({
-        period: labels[i],
-        amount: Math.round(baseAmount),
-        donors: Math.round(baseDonors),
-        date: new Date(Date.now() - (dataPoints - i) * 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
-      });
-    }
-
-    return data;
+  // Generate data based on time range
+  const generateDonationData = (range: string) => {
+    const baseData = {
+      '7d': [
+        { period: 'Mon', amount: 1200, donors: 8, date: '2024-01-15' },
+        { period: 'Tue', amount: 1800, donors: 12, date: '2024-01-16' },
+        { period: 'Wed', amount: 2200, donors: 15, date: '2024-01-17' },
+        { period: 'Thu', amount: 1600, donors: 11, date: '2024-01-18' },
+        { period: 'Fri', amount: 2800, donors: 19, date: '2024-01-19' },
+        { period: 'Sat', amount: 3200, donors: 22, date: '2024-01-20' },
+        { period: 'Sun', amount: 2400, donors: 16, date: '2024-01-21' }
+      ],
+      '30d': [
+        { period: 'Week 1', amount: 12000, donors: 80, date: 'Jan 1-7' },
+        { period: 'Week 2', amount: 15000, donors: 95, date: 'Jan 8-14' },
+        { period: 'Week 3', amount: 18000, donors: 110, date: 'Jan 15-21' },
+        { period: 'Week 4', amount: 22000, donors: 130, date: 'Jan 22-28' }
+      ],
+      '90d': [
+        { period: 'Month 1', amount: 45000, donors: 320, date: 'Nov 2023' },
+        { period: 'Month 2', amount: 52000, donors: 380, date: 'Dec 2023' },
+        { period: 'Month 3', amount: 67000, donors: 450, date: 'Jan 2024' }
+      ],
+      '1y': [
+        { period: 'Q1', amount: 120000, donors: 800, date: 'Q1 2023' },
+        { period: 'Q2', amount: 145000, donors: 950, date: 'Q2 2023' },
+        { period: 'Q3', amount: 168000, donors: 1100, date: 'Q3 2023' },
+        { period: 'Q4', amount: 195000, donors: 1300, date: 'Q4 2023' }
+      ]
+    };
+    return baseData[range as keyof typeof baseData] || baseData['30d'];
   };
 
-  const [donationData, setDonationData] = useState(() => generateTimeRangeData('30d'));
-
-  useEffect(() => {
-    setDonationData(generateTimeRangeData(timeRange));
-  }, [timeRange]);
+  const donationData = generateDonationData(timeRange);
 
   // Mock data for dashboard
   const ngoStats = {
@@ -124,135 +112,37 @@ export const Dashboard: React.FC = () => {
   };
 
   const donorStats = {
-    totalDonated: 15750,
-    ngoSupported: 12,
+    totalDonated: 12500,
+    ngosSupported: 8,
     impactPoints: 2340,
-    donationStreak: 8,
-    totalImpact: 156,
-    averageDonation: 875,
-    monthlyDonations: 3,
-    yearlyGrowth: 45.2
+    donationStreak: 15,
+    monthlyAverage: 850,
+    yearlyTotal: 10200,
+    favoriteCategory: 'Education',
+    lastDonation: '3 days ago'
   };
 
   const recentDonations = [
-    { 
-      id: 1, 
-      donor: 'Anonymous', 
-      amount: 500, 
-      campaign: 'Clean Water Initiative', 
-      time: '2 hours ago', 
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg',
-      txHash: '0x1234...5678',
-      message: 'Keep up the great work!',
-      status: 'completed'
-    },
-    { 
-      id: 2, 
-      donor: 'Sarah Chen', 
-      amount: 1000, 
-      campaign: 'Education for All', 
-      time: '4 hours ago', 
-      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
-      txHash: '0x2345...6789',
-      message: 'Education is the key to breaking the cycle of poverty.',
-      status: 'completed'
-    },
-    { 
-      id: 3, 
-      donor: 'Michael Rodriguez', 
-      amount: 250, 
-      campaign: 'Healthcare Access', 
-      time: '6 hours ago', 
-      avatar: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg',
-      txHash: '0x3456...7890',
-      message: 'Thank you for your transparency.',
-      status: 'completed'
-    },
-    { 
-      id: 4, 
-      donor: 'Emma Wilson', 
-      amount: 750, 
-      campaign: 'Clean Water Initiative', 
-      time: '8 hours ago', 
-      avatar: 'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg',
-      txHash: '0x4567...8901',
-      message: 'Water is life. Proud to support this cause.',
-      status: 'completed'
-    },
-    { 
-      id: 5, 
-      donor: 'David Kim', 
-      amount: 2000, 
-      campaign: 'Education for All', 
-      time: '1 day ago', 
-      avatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg',
-      txHash: '0x5678...9012',
-      message: 'Investing in the future generation.',
-      status: 'completed'
-    }
+    { id: 1, donor: 'Anonymous', amount: 500, campaign: 'Clean Water Initiative', time: '2 hours ago', avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg', status: 'completed' },
+    { id: 2, donor: 'Sarah Chen', amount: 1000, campaign: 'Education for All', time: '4 hours ago', avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg', status: 'completed' },
+    { id: 3, donor: 'Michael Rodriguez', amount: 250, campaign: 'Healthcare Access', time: '6 hours ago', avatar: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg', status: 'pending' },
+    { id: 4, donor: 'Emma Wilson', amount: 750, campaign: 'Clean Water Initiative', time: '8 hours ago', avatar: 'https://images.pexels.com/photos/1382731/pexels-photo-1382731.jpeg', status: 'completed' },
+    { id: 5, donor: 'David Kim', amount: 2000, campaign: 'Education for All', time: '1 day ago', avatar: 'https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg', status: 'completed' }
   ];
 
-  const myDonations = [
-    {
-      id: 1,
-      ngo: 'Clean Water Initiative',
-      amount: 500,
-      date: '2024-01-15',
-      impact: 'Provided clean water for 25 people',
-      status: 'active',
-      image: 'https://images.pexels.com/photos/2260655/pexels-photo-2260655.jpeg'
-    },
-    {
-      id: 2,
-      ngo: 'Education for All',
-      amount: 1200,
-      date: '2024-01-10',
-      impact: 'Funded education for 3 children for 6 months',
-      status: 'completed',
-      image: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg'
-    },
-    {
-      id: 3,
-      ngo: 'Healthcare Access',
-      amount: 750,
-      date: '2024-01-05',
-      impact: 'Provided medical supplies for rural clinic',
-      status: 'active',
-      image: 'https://images.pexels.com/photos/4033148/pexels-photo-4033148.jpeg'
-    }
+  const myDonationHistory = [
+    { id: 1, ngo: 'Clean Water Initiative', amount: 500, date: '2024-01-20', status: 'completed', impact: 'Provided clean water for 25 people' },
+    { id: 2, ngo: 'Education for All', amount: 1000, date: '2024-01-15', status: 'completed', impact: 'Funded school supplies for 50 children' },
+    { id: 3, ngo: 'Healthcare Access', amount: 250, date: '2024-01-10', status: 'completed', impact: 'Supported 10 medical consultations' },
+    { id: 4, ngo: 'Environmental Protection', amount: 750, date: '2024-01-05', status: 'completed', impact: 'Planted 150 trees' },
+    { id: 5, ngo: 'Poverty Alleviation', amount: 300, date: '2023-12-28', status: 'completed', impact: 'Provided meals for 60 families' }
   ];
 
   const supportedNGOs = [
-    {
-      id: 1,
-      name: 'Clean Water Initiative',
-      totalDonated: 1500,
-      lastDonation: '2024-01-15',
-      relationship: '6 months',
-      impact: '75 people helped',
-      image: 'https://images.pexels.com/photos/2260655/pexels-photo-2260655.jpeg',
-      category: 'Environment'
-    },
-    {
-      id: 2,
-      name: 'Education for All',
-      totalDonated: 2400,
-      lastDonation: '2024-01-10',
-      relationship: '1 year',
-      impact: '12 children educated',
-      image: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg',
-      category: 'Education'
-    },
-    {
-      id: 3,
-      name: 'Healthcare Access',
-      totalDonated: 950,
-      lastDonation: '2024-01-05',
-      relationship: '3 months',
-      impact: '5 clinics supported',
-      image: 'https://images.pexels.com/photos/4033148/pexels-photo-4033148.jpeg',
-      category: 'Healthcare'
-    }
+    { id: 1, name: 'Clean Water Initiative', totalDonated: 1500, lastDonation: '2024-01-20', campaigns: 3, image: 'https://images.pexels.com/photos/2260655/pexels-photo-2260655.jpeg' },
+    { id: 2, name: 'Education for All', totalDonated: 2000, lastDonation: '2024-01-15', campaigns: 2, image: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg' },
+    { id: 3, name: 'Healthcare Access', totalDonated: 750, lastDonation: '2024-01-10', campaigns: 1, image: 'https://images.pexels.com/photos/4033148/pexels-photo-4033148.jpeg' },
+    { id: 4, name: 'Environmental Protection', totalDonated: 1250, lastDonation: '2024-01-05', campaigns: 4, image: 'https://images.pexels.com/photos/347140/pexels-photo-347140.jpeg' }
   ];
 
   const campaigns = [
@@ -298,16 +188,18 @@ export const Dashboard: React.FC = () => {
     { name: 'Poverty', value: 15, color: '#f59e0b' }
   ];
 
-  const impactMetrics = userRole === 'ngo' ? [
+  const impactMetrics = [
     { label: 'People Helped', value: 15420, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
     { label: 'Communities Reached', value: 89, icon: Globe, color: 'text-green-600', bg: 'bg-green-50' },
     { label: 'Projects Completed', value: 7, icon: CheckCircle2, color: 'text-purple-600', bg: 'bg-purple-50' },
     { label: 'Success Rate', value: 94, icon: Target, color: 'text-orange-600', bg: 'bg-orange-50', suffix: '%' }
-  ] : [
-    { label: 'People Helped', value: 156, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'NGOs Supported', value: 12, icon: Heart, color: 'text-red-600', bg: 'bg-red-50' },
+  ];
+
+  const donorImpactMetrics = [
+    { label: 'People Helped', value: 234, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'NGOs Supported', value: 8, icon: Heart, color: 'text-red-600', bg: 'bg-red-50' },
     { label: 'Impact Points', value: 2340, icon: Award, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { label: 'Donation Streak', value: 8, icon: Target, color: 'text-orange-600', bg: 'bg-orange-50', suffix: ' months' }
+    { label: 'Donation Streak', value: 15, icon: Target, color: 'text-orange-600', bg: 'bg-orange-50', suffix: ' days' }
   ];
 
   const ngoTabs = [
@@ -320,22 +212,16 @@ export const Dashboard: React.FC = () => {
 
   const donorTabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'donations', label: 'My Donations', icon: Heart },
-    { id: 'supported', label: 'Supported NGOs', icon: Users },
+    { id: 'donations', label: 'My Donations', icon: DollarSign },
+    { id: 'ngos', label: 'Supported NGOs', icon: Heart },
     { id: 'impact', label: 'My Impact', icon: Award }
   ];
 
-  const tabs = userRole === 'ngo' ? ngoTabs : donorTabs;
-  const currentStats = userRole === 'ngo' ? ngoStats : donorStats;
+  const currentTabs = userRole === 'ngo' ? ngoTabs : donorTabs;
 
   const handleActivityClick = (activity: any) => {
     setSelectedActivity(activity);
     setShowActivityModal(true);
-  };
-
-  const closeActivityModal = () => {
-    setShowActivityModal(false);
-    setSelectedActivity(null);
   };
 
   return (
@@ -361,28 +247,32 @@ export const Dashboard: React.FC = () => {
               </p>
             </div>
             <div className="mt-4 lg:mt-0 flex items-center space-x-4">
-              {/* Role Toggle */}
-              <div className="flex items-center bg-white rounded-lg p-1 border border-gray-200">
-                <button
-                  onClick={() => setUserRole('ngo')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    userRole === 'ngo'
-                      ? 'bg-green-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:text-green-600'
-                  }`}
-                >
-                  NGO Admin
-                </button>
-                <button
-                  onClick={() => setUserRole('donor')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    userRole === 'donor'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:text-blue-600'
-                  }`}
-                >
-                  Donor
-                </button>
+              {/* Role Switcher */}
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-medium text-gray-700">Role:</span>
+                <div className="relative">
+                  <button
+                    onClick={() => setUserRole(userRole === 'donor' ? 'ngo' : 'donor')}
+                    className={`relative inline-flex h-10 w-20 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                      userRole === 'ngo' 
+                        ? 'bg-green-600 focus:ring-green-500' 
+                        : 'bg-blue-600 focus:ring-blue-500'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-8 w-8 transform rounded-full bg-white transition-transform ${
+                        userRole === 'ngo' ? 'translate-x-11' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                  <div className="absolute -bottom-6 left-0 right-0 text-center">
+                    <span className={`text-xs font-medium ${
+                      userRole === 'ngo' ? 'text-green-600' : 'text-blue-600'
+                    }`}>
+                      {userRole === 'ngo' ? 'NGO Admin' : 'Donor'}
+                    </span>
+                  </div>
+                </div>
               </div>
               
               <div className="flex space-x-3">
@@ -417,11 +307,11 @@ export const Dashboard: React.FC = () => {
                   <div>
                     <p className="text-blue-100 text-sm font-medium">Total Raised</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.totalRaised} prefix="RM " />
+                      <AnimatedCounter value={ngoStats.totalRaised} prefix="RM " />
                     </div>
                     <div className="flex items-center mt-2 text-blue-100">
                       <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">+{currentStats.monthlyGrowth}% this month</span>
+                      <span className="text-sm">+{ngoStats.monthlyGrowth}% this month</span>
                     </div>
                   </div>
                   <DollarSign className="w-8 h-8 text-blue-200" />
@@ -433,7 +323,7 @@ export const Dashboard: React.FC = () => {
                   <div>
                     <p className="text-green-100 text-sm font-medium">Total Donors</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.totalDonors} />
+                      <AnimatedCounter value={ngoStats.totalDonors} />
                     </div>
                     <div className="flex items-center mt-2 text-green-100">
                       <ArrowUpRight className="w-4 h-4 mr-1" />
@@ -449,11 +339,11 @@ export const Dashboard: React.FC = () => {
                   <div>
                     <p className="text-purple-100 text-sm font-medium">Active Campaigns</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.activeCampaigns} />
+                      <AnimatedCounter value={ngoStats.activeCampaigns} />
                     </div>
                     <div className="flex items-center mt-2 text-purple-100">
                       <Activity className="w-4 h-4 mr-1" />
-                      <span className="text-sm">{currentStats.completedCampaigns} completed</span>
+                      <span className="text-sm">{ngoStats.completedCampaigns} completed</span>
                     </div>
                   </div>
                   <Heart className="w-8 h-8 text-purple-200" />
@@ -465,11 +355,11 @@ export const Dashboard: React.FC = () => {
                   <div>
                     <p className="text-orange-100 text-sm font-medium">Avg. Donation</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.averageDonation} prefix="RM " />
+                      <AnimatedCounter value={ngoStats.averageDonation} prefix="RM " />
                     </div>
                     <div className="flex items-center mt-2 text-orange-100">
                       <TrendingUp className="w-4 h-4 mr-1" />
-                      <span className="text-sm">{currentStats.conversionRate}% conversion</span>
+                      <span className="text-sm">{ngoStats.conversionRate}% conversion</span>
                     </div>
                   </div>
                   <Target className="w-8 h-8 text-orange-200" />
@@ -483,30 +373,30 @@ export const Dashboard: React.FC = () => {
                   <div>
                     <p className="text-blue-100 text-sm font-medium">Total Donated</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.totalDonated} prefix="RM " />
+                      <AnimatedCounter value={donorStats.totalDonated} prefix="RM " />
                     </div>
                     <div className="flex items-center mt-2 text-blue-100">
                       <ArrowUpRight className="w-4 h-4 mr-1" />
-                      <span className="text-sm">+{currentStats.yearlyGrowth}% this year</span>
+                      <span className="text-sm">Last: {donorStats.lastDonation}</span>
                     </div>
                   </div>
-                  <Heart className="w-8 h-8 text-blue-200" />
+                  <DollarSign className="w-8 h-8 text-blue-200" />
                 </div>
               </Card>
 
-              <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
+              <Card className="p-6 bg-gradient-to-br from-red-500 to-red-600 text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-green-100 text-sm font-medium">NGOs Supported</p>
+                    <p className="text-red-100 text-sm font-medium">NGOs Supported</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.ngoSupported} />
+                      <AnimatedCounter value={donorStats.ngosSupported} />
                     </div>
-                    <div className="flex items-center mt-2 text-green-100">
-                      <Users className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Across 8 categories</span>
+                    <div className="flex items-center mt-2 text-red-100">
+                      <Heart className="w-4 h-4 mr-1" />
+                      <span className="text-sm">Favorite: {donorStats.favoriteCategory}</span>
                     </div>
                   </div>
-                  <Globe className="w-8 h-8 text-green-200" />
+                  <Heart className="w-8 h-8 text-red-200" />
                 </div>
               </Card>
 
@@ -515,14 +405,14 @@ export const Dashboard: React.FC = () => {
                   <div>
                     <p className="text-purple-100 text-sm font-medium">Impact Points</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.impactPoints} />
+                      <AnimatedCounter value={donorStats.impactPoints} />
                     </div>
                     <div className="flex items-center mt-2 text-purple-100">
                       <Award className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Top 5% donor</span>
+                      <span className="text-sm">Monthly avg: RM{donorStats.monthlyAverage}</span>
                     </div>
                   </div>
-                  <Trophy className="w-8 h-8 text-purple-200" />
+                  <Award className="w-8 h-8 text-purple-200" />
                 </div>
               </Card>
 
@@ -531,14 +421,14 @@ export const Dashboard: React.FC = () => {
                   <div>
                     <p className="text-orange-100 text-sm font-medium">Donation Streak</p>
                     <div className="text-2xl font-bold">
-                      <AnimatedCounter value={currentStats.donationStreak} suffix=" months" />
+                      <AnimatedCounter value={donorStats.donationStreak} suffix=" days" />
                     </div>
                     <div className="flex items-center mt-2 text-orange-100">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      <span className="text-sm">{currentStats.monthlyDonations} this month</span>
+                      <Target className="w-4 h-4 mr-1" />
+                      <span className="text-sm">Keep it up!</span>
                     </div>
                   </div>
-                  <Clock className="w-8 h-8 text-orange-200" />
+                  <Target className="w-8 h-8 text-orange-200" />
                 </div>
               </Card>
             </>
@@ -554,7 +444,7 @@ export const Dashboard: React.FC = () => {
         >
           <Card className="p-2">
             <nav className="flex space-x-2">
-              {tabs.map((tab) => (
+              {currentTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -576,7 +466,7 @@ export const Dashboard: React.FC = () => {
 
         {/* Tab Content */}
         <motion.div
-          key={activeTab}
+          key={`${userRole}-${activeTab}`}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
@@ -620,14 +510,12 @@ export const Dashboard: React.FC = () => {
                         }}
                       />
                       <Area type="monotone" dataKey="amount" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
-                      {userRole === 'ngo' && (
-                        <Area type="monotone" dataKey="donors" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
-                      )}
+                      <Area type="monotone" dataKey="donors" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </Card>
 
-                {/* Campaign Performance / Recent Donations */}
+                {/* Campaign Performance / My Donations */}
                 {userRole === 'ngo' ? (
                   <Card className="p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-6">Campaign Performance</h3>
@@ -678,29 +566,22 @@ export const Dashboard: React.FC = () => {
                   <Card className="p-6">
                     <h3 className="text-xl font-semibold text-gray-900 mb-6">Recent Donations</h3>
                     <div className="space-y-4">
-                      {myDonations.map((donation) => (
+                      {myDonationHistory.slice(0, 3).map((donation) => (
                         <div key={donation.id} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center space-x-4">
-                            <img
-                              src={donation.image}
-                              alt={donation.ngo}
-                              className="w-16 h-16 rounded-lg object-cover"
-                            />
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between mb-2">
-                                <h4 className="font-semibold text-gray-900">{donation.ngo}</h4>
-                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                                  donation.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                                }`}>
-                                  {donation.status}
-                                </span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-2">{donation.impact}</p>
-                              <div className="flex items-center justify-between text-sm text-gray-600">
-                                <span className="font-medium text-blue-600">RM {donation.amount.toLocaleString()}</span>
-                                <span>{donation.date}</span>
-                              </div>
-                            </div>
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900">{donation.ngo}</h4>
+                            <span className="text-lg font-bold text-green-600">
+                              RM {donation.amount}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">{donation.impact}</p>
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            <span>{donation.date}</span>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              donation.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {donation.status}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -715,10 +596,21 @@ export const Dashboard: React.FC = () => {
                 <Card className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleActivityClick(recentDonations[0])}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
                   </div>
                   <div className="space-y-4">
                     {recentDonations.slice(0, 5).map((donation) => (
-                      <div key={donation.id} className="flex items-center space-x-3">
+                      <div 
+                        key={donation.id} 
+                        className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                        onClick={() => handleActivityClick(donation)}
+                      >
                         <img
                           src={donation.avatar}
                           alt={donation.donor}
@@ -736,13 +628,9 @@ export const Dashboard: React.FC = () => {
                           <p className="text-sm font-semibold text-green-600">
                             +RM {donation.amount}
                           </p>
-                          <button
-                            onClick={() => handleActivityClick(donation)}
-                            className="text-xs text-blue-500 hover:text-blue-700 flex items-center"
-                          >
-                            <Eye className="w-3 h-3 mr-1" />
-                            View
-                          </button>
+                          <p className="text-xs text-gray-500">
+                            {donation.time}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -755,7 +643,7 @@ export const Dashboard: React.FC = () => {
                     {userRole === 'ngo' ? 'Impact Overview' : 'Your Impact'}
                   </h3>
                   <div className="space-y-4">
-                    {impactMetrics.map((metric, index) => (
+                    {(userRole === 'ngo' ? impactMetrics : donorImpactMetrics).map((metric, index) => (
                       <div key={index} className="flex items-center space-x-3">
                         <div className={`w-10 h-10 rounded-lg ${metric.bg} flex items-center justify-center`}>
                           <metric.icon className={`w-5 h-5 ${metric.color}`} />
@@ -819,7 +707,133 @@ export const Dashboard: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'campaigns' && userRole === 'ngo' && (
+          {/* Other tabs content */}
+          {activeTab === 'donations' && userRole === 'donor' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">My Donation History</h2>
+                <div className="flex space-x-3">
+                  <Button variant="outline">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export
+                  </Button>
+                  <Button variant="outline">
+                    <Filter className="w-4 h-4 mr-2" />
+                    Filter
+                  </Button>
+                </div>
+              </div>
+
+              <Card className="overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          NGO
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Amount
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Impact
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {myDonationHistory.map((donation) => (
+                        <tr key={donation.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-medium text-gray-900">
+                              {donation.ngo}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                            RM {donation.amount.toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {donation.date}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
+                            {donation.impact}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                              {donation.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {activeTab === 'ngos' && userRole === 'donor' && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Supported NGOs</h2>
+                <Link to="/discover">
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Support New NGO
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {supportedNGOs.map((ngo) => (
+                  <Card key={ngo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="relative h-48">
+                      <img
+                        src={ngo.image}
+                        alt={ngo.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{ngo.name}</h3>
+                      <div className="space-y-2 text-sm text-gray-600 mb-4">
+                        <div className="flex justify-between">
+                          <span>Total Donated:</span>
+                          <span className="font-semibold text-green-600">RM {ngo.totalDonated}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Campaigns Supported:</span>
+                          <span className="font-medium">{ngo.campaigns}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Last Donation:</span>
+                          <span className="font-medium">{ngo.lastDonation}</span>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm" className="flex-1">
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                        <Button variant="outline" size="sm" className="flex-1">
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Visit
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* NGO specific tabs */}
+          {userRole === 'ngo' && activeTab === 'campaigns' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900">My Campaigns</h2>
@@ -895,7 +909,7 @@ export const Dashboard: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'analytics' && userRole === 'ngo' && (
+          {userRole === 'ngo' && activeTab === 'analytics' && (
             <div className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Donation Categories */}
@@ -974,23 +988,11 @@ export const Dashboard: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'donations' && (
+          {userRole === 'ngo' && activeTab === 'donations' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {userRole === 'ngo' ? 'Donation History' : 'My Donations'}
-                </h2>
+                <h2 className="text-2xl font-bold text-gray-900">Donation History</h2>
                 <div className="flex space-x-3">
-                  <select
-                    value={timeRange}
-                    onChange={(e) => setTimeRange(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d">Last 30 days</option>
-                    <option value="90d">Last 90 days</option>
-                    <option value="1y">Last year</option>
-                  </select>
                   <Button variant="outline">
                     <Download className="w-4 h-4 mr-2" />
                     Export
@@ -1008,10 +1010,10 @@ export const Dashboard: React.FC = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          {userRole === 'ngo' ? 'Donor' : 'NGO'}
+                          Donor
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          {userRole === 'ngo' ? 'Campaign' : 'Impact'}
+                          Campaign
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Amount
@@ -1025,32 +1027,34 @@ export const Dashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {(userRole === 'ngo' ? recentDonations : myDonations).map((item) => (
-                        <tr key={item.id} className="hover:bg-gray-50">
+                      {recentDonations.map((donation) => (
+                        <tr key={donation.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <img
-                                src={userRole === 'ngo' ? item.avatar : item.image}
-                                alt={userRole === 'ngo' ? item.donor : item.ngo}
+                                src={donation.avatar}
+                                alt={donation.donor}
                                 className="w-8 h-8 rounded-full mr-3"
                               />
                               <span className="text-sm font-medium text-gray-900">
-                                {userRole === 'ngo' ? item.donor : item.ngo}
+                                {donation.donor}
                               </span>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {userRole === 'ngo' ? item.campaign : item.impact}
+                            {donation.campaign}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                            RM {item.amount.toLocaleString()}
+                            RM {donation.amount.toLocaleString()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            {userRole === 'ngo' ? item.time : item.date}
+                            {donation.time}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                              {item.status || 'Completed'}
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              donation.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {donation.status}
                             </span>
                           </td>
                         </tr>
@@ -1062,99 +1066,22 @@ export const Dashboard: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'supported' && userRole === 'donor' && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Supported NGOs</h2>
-                <div className="flex space-x-3">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <input
-                      type="text"
-                      placeholder="Search NGOs..."
-                      className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <Button variant="outline">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {supportedNGOs.map((ngo) => (
-                  <Card key={ngo.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="relative h-48">
-                      <img
-                        src={ngo.image}
-                        alt={ngo.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-3 left-3">
-                        <span className="px-2 py-1 text-xs font-medium bg-white/90 text-gray-800 rounded-full">
-                          {ngo.category}
-                        </span>
-                      </div>
-                      <div className="absolute top-3 right-3">
-                        <Button variant="ghost" size="sm" className="bg-white/20 text-white hover:bg-white/30">
-                          <Bookmark className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{ngo.name}</h3>
-                      <div className="space-y-2 mb-4">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Total Donated:</span>
-                          <span className="font-semibold text-blue-600">RM {ngo.totalDonated.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Relationship:</span>
-                          <span className="font-medium">{ngo.relationship}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Impact:</span>
-                          <span className="font-medium text-green-600">{ngo.impact}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Last Donation:</span>
-                          <span className="text-gray-500">{ngo.lastDonation}</span>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" className="flex-1">
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                        <Button size="sm" className="flex-1 bg-blue-600 hover:bg-blue-700">
-                          <Heart className="w-4 h-4 mr-1" />
-                          Donate
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
-
           {activeTab === 'impact' && (
             <div className="space-y-8">
               <div className="text-center">
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                  {userRole === 'ngo' ? 'Your Impact Dashboard' : 'Your Impact Story'}
+                  {userRole === 'ngo' ? 'Your Impact Dashboard' : 'Your Personal Impact'}
                 </h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                   {userRole === 'ngo' 
                     ? 'See the real-world difference your campaigns are making in communities worldwide'
-                    : 'Track the positive change you\'re creating through your generous donations'
+                    : 'Track the positive change you\'re creating through your donations'
                   }
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {impactMetrics.map((metric, index) => (
+                {(userRole === 'ngo' ? impactMetrics : donorImpactMetrics).map((metric, index) => (
                   <Card key={index} className="p-6 text-center">
                     <div className={`w-16 h-16 rounded-full ${metric.bg} flex items-center justify-center mx-auto mb-4`}>
                       <metric.icon className={`w-8 h-8 ${metric.color}`} />
@@ -1181,69 +1108,48 @@ export const Dashboard: React.FC = () => {
                       <Tooltip />
                       <Line 
                         type="monotone" 
-                        dataKey={userRole === 'ngo' ? 'donors' : 'amount'} 
-                        stroke={userRole === 'ngo' ? '#22c55e' : '#3b82f6'} 
+                        dataKey="donors" 
+                        stroke="#22c55e" 
                         strokeWidth={3}
-                        dot={{ fill: userRole === 'ngo' ? '#22c55e' : '#3b82f6', strokeWidth: 2, r: 4 }}
+                        dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
                       />
                     </RechartsLineChart>
                   </ResponsiveContainer>
                 </Card>
 
                 <Card className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-6">
-                    {userRole === 'ngo' ? 'Success Stories' : 'Impact Highlights'}
-                  </h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Success Stories</h3>
                   <div className="space-y-4">
-                    {userRole === 'ngo' ? (
-                      <>
-                        <div className="border-l-4 border-green-500 pl-4">
-                          <h4 className="font-semibold text-gray-900">Clean Water Access</h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Provided clean water access to 5,420 people across 12 villages in rural areas.
-                          </p>
-                          <span className="text-xs text-green-600 font-medium">Completed • 3 months ago</span>
-                        </div>
-                        <div className="border-l-4 border-blue-500 pl-4">
-                          <h4 className="font-semibold text-gray-900">Education Initiative</h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Built 3 schools and provided education materials for 2,100 children.
-                          </p>
-                          <span className="text-xs text-blue-600 font-medium">Completed • 6 months ago</span>
-                        </div>
-                        <div className="border-l-4 border-purple-500 pl-4">
-                          <h4 className="font-semibold text-gray-900">Healthcare Program</h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Established mobile clinics serving 8,900 people in remote communities.
-                          </p>
-                          <span className="text-xs text-purple-600 font-medium">Ongoing • Started 2 months ago</span>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="border-l-4 border-blue-500 pl-4">
-                          <h4 className="font-semibold text-gray-900">Education Support</h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Your donations have helped educate 12 children for a full academic year.
-                          </p>
-                          <span className="text-xs text-blue-600 font-medium">Active • 3 NGOs supported</span>
-                        </div>
-                        <div className="border-l-4 border-green-500 pl-4">
-                          <h4 className="font-semibold text-gray-900">Clean Water Impact</h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Contributed to providing clean water access for 75 people in rural communities.
-                          </p>
-                          <span className="text-xs text-green-600 font-medium">Completed • 2 projects funded</span>
-                        </div>
-                        <div className="border-l-4 border-red-500 pl-4">
-                          <h4 className="font-semibold text-gray-900">Healthcare Access</h4>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Helped provide medical supplies and support for 5 rural clinics.
-                          </p>
-                          <span className="text-xs text-red-600 font-medium">Ongoing • 1 NGO supported</span>
-                        </div>
-                      </>
-                    )}
+                    <div className="border-l-4 border-green-500 pl-4">
+                      <h4 className="font-semibold text-gray-900">Clean Water Access</h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {userRole === 'ngo' 
+                          ? 'Provided clean water access to 5,420 people across 12 villages in rural areas.'
+                          : 'Your donations helped provide clean water access to 234 people in rural communities.'
+                        }
+                      </p>
+                      <span className="text-xs text-green-600 font-medium">Completed • 3 months ago</span>
+                    </div>
+                    <div className="border-l-4 border-blue-500 pl-4">
+                      <h4 className="font-semibold text-gray-900">Education Initiative</h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {userRole === 'ngo'
+                          ? 'Built 3 schools and provided education materials for 2,100 children.'
+                          : 'Contributed to building schools and providing education for 89 children.'
+                        }
+                      </p>
+                      <span className="text-xs text-blue-600 font-medium">Completed • 6 months ago</span>
+                    </div>
+                    <div className="border-l-4 border-purple-500 pl-4">
+                      <h4 className="font-semibold text-gray-900">Healthcare Program</h4>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {userRole === 'ngo'
+                          ? 'Established mobile clinics serving 8,900 people in remote communities.'
+                          : 'Supported mobile clinics that served 156 people in remote areas.'
+                        }
+                      </p>
+                      <span className="text-xs text-purple-600 font-medium">Ongoing • Started 2 months ago</span>
+                    </div>
                   </div>
                 </Card>
               </div>
@@ -1263,7 +1169,7 @@ export const Dashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Donation Details</h3>
                 <button
-                  onClick={closeActivityModal}
+                  onClick={() => setShowActivityModal(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-5 h-5" />
@@ -1287,7 +1193,7 @@ export const Dashboard: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-500">Amount</p>
-                      <p className="font-semibold text-green-600">RM {selectedActivity.amount.toLocaleString()}</p>
+                      <p className="font-semibold text-green-600">RM {selectedActivity.amount}</p>
                     </div>
                     <div>
                       <p className="text-gray-500">Campaign</p>
@@ -1295,33 +1201,38 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-gray-500">Status</p>
-                      <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                      <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
+                        selectedActivity.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
                         {selectedActivity.status}
                       </span>
                     </div>
                     <div>
-                      <p className="text-gray-500">Transaction</p>
-                      <p className="font-mono text-xs text-blue-600">{selectedActivity.txHash}</p>
+                      <p className="text-gray-500">Transaction ID</p>
+                      <p className="font-mono text-xs">0x1234...5678</p>
                     </div>
                   </div>
                 </div>
                 
-                {selectedActivity.message && (
-                  <div className="border-t border-gray-200 pt-4">
-                    <p className="text-gray-500 text-sm mb-2">Message from donor:</p>
-                    <p className="text-gray-700 italic">"{selectedActivity.message}"</p>
-                  </div>
-                )}
-                
-                <div className="flex space-x-3 pt-4">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View Transaction
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={closeActivityModal}>
-                    Close
-                  </Button>
+                <div className="border-t border-gray-200 pt-4">
+                  <p className="text-sm text-gray-500 mb-2">Message from donor:</p>
+                  <p className="text-sm text-gray-700 italic">
+                    "Happy to support this amazing cause. Keep up the great work!"
+                  </p>
                 </div>
+              </div>
+              
+              <div className="flex space-x-3 mt-6">
+                <Button variant="outline" className="flex-1">
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  View Transaction
+                </Button>
+                <Button 
+                  onClick={() => setShowActivityModal(false)}
+                  className="flex-1"
+                >
+                  Close
+                </Button>
               </div>
             </motion.div>
           </div>
