@@ -28,22 +28,16 @@ export const About: React.FC = () => {
 
   const team = [
     {
-      name: 'Sarah Chen',
+      name: 'Alvin Yap',
       role: 'CEO & Co-Founder',
-      bio: 'Former international aid worker with 8+ years in nonprofit management and development.',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg',
+      bio: 'Coinbase incubatee who wants to revolutionize NGO funding via Web3 technology after witnessing funding challenges firsthand.',
+      avatar: '/public/avatar-alvin.jpeg',
     },
     {
-      name: 'Marcus Rodriguez',
+      name: 'Sky Yap',
       role: 'CTO & Co-Founder',
-      bio: 'Technology expert with extensive experience in building transparent donation tracking systems.',
-      avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
-    },
-    {
-      name: 'Elena Volkov',
-      role: 'Head of NGO Relations',
-      bio: 'Nonprofit strategist with extensive experience in international development and community building.',
-      avatar: 'https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg',
+      bio: 'Blockchain developer to solve the transparency crisis in charitable giving. Built the smart contract architecture that powers GiveHope\'s trust-first approach.',
+      avatar: '/public/avatar-sky.jpeg',
     },
   ];
 
@@ -216,8 +210,8 @@ export const About: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 justify-center">
               {team.map((member, index) => (
                 <motion.div
                   key={index}
