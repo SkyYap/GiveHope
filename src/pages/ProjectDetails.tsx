@@ -412,7 +412,7 @@ export const ProjectDetails: React.FC = () => {
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                     <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                      Donate Now
+                      Stake Now
                     </Button>
                     <p className="text-xs text-gray-500 text-center">
                       Secure payment via smart contract
@@ -499,7 +499,7 @@ export const ProjectDetails: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">Impact Projection</h3>
             <div className="flex space-x-4 items-end mb-4">
               <div className="flex-1">
-                <label className="block text-sm text-gray-600 mb-1">Donation Amount (RM)</label>
+                <label className="block text-sm text-gray-600 mb-1">Stake Amount (RM)</label>
                 <input
                   type="number"
                   placeholder="Enter amount"
@@ -520,21 +520,21 @@ export const ProjectDetails: React.FC = () => {
               </div>
               <div>
                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                  Donate Now
+                  Stake Now
                 </Button>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={300}>
               <LineChart data={impactData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" label={{ value: 'Day', position: 'insideBottom', offset: 0 }} />
-                <YAxis label={{ value: 'People Helped', angle: -90, position: 'insideLeft', offset: 10 }} />
+                <XAxis dataKey="day" label={{ value: 'Day', position: 'outsideBottom', offset: 30 }} />
+                <YAxis label={{ value: 'Actual Donate Amount', angle: -90, position: 'insideBottomLeft', offset: 30 }} />
                 <Tooltip />
                 <Line type="monotone" dataKey="impact" stroke="#22c55e" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
             <p className="text-xs text-gray-500 mt-2">
-              Projected impact based on your donation amount and the NGO's efficiency metrics.
+              Projected impact based on your stake amount and the NGO's efficiency metrics.
             </p>
           </Card>
         </motion.div>
