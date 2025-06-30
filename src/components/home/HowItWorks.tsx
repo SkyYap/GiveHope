@@ -9,8 +9,8 @@ export const HowItWorks: React.FC = () => {
       image: 'https://images.pexels.com/photos/1194775/pexels-photo-1194775.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
     {
-      title: 'Donate Transparently',
-      description: 'Make secure donations to your chosen NGOs with complete transparency. Track exactly how your contribution is being used and see the real impact of your generosity.',
+      title: 'Stake Transparently',
+      description: 'Make secure staking to your chosen NGOs with complete transparency. Track exactly how your contribution is being used and see the real impact of your generosity.',
       image: 'https://images.pexels.com/photos/8931674/pexels-photo-8931674.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
     {
@@ -36,7 +36,7 @@ export const HowItWorks: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
           >
-            How Our Transparent Donation System Works
+            How Our Stake-to-Donate System Works
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

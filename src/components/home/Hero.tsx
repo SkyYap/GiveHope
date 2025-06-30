@@ -34,9 +34,9 @@ export const Hero: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
             >
-              Support NGOs{' '}
+              Funding Hope{' '}
               <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                Making a Difference
+                Fueling Impact
               </span>
             </motion.h1>
             
@@ -47,7 +47,7 @@ export const Hero: React.FC = () => {
               className="text-xl text-blue-100 mb-8 leading-relaxed"
             >
               From education to environmental conservation, 
-              back the next generation of sustainable development and humanitarian efforts.
+              back the sustainable development without sacrificing your principal.
             </motion.p>
             
             <motion.div
