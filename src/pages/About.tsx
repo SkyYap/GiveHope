@@ -28,16 +28,16 @@ export const About: React.FC = () => {
 
   const team = [
     {
-      name: 'Alvin Yap',
+      name: 'Sky Yap',
       role: 'CEO & Co-Founder',
       bio: 'Coinbase incubatee who wants to revolutionize NGO funding via Web3 technology after witnessing funding challenges firsthand.',
-      avatar: '/public/avatar-alvin.jpeg',
+      avatar: '/public/avatar-sky.jpeg',
     },
     {
-      name: 'Sky Yap',
+      name: 'Alvin Yap',
       role: 'CTO & Co-Founder',
       bio: 'Blockchain developer to solve the transparency crisis in charitable giving. Built the smart contract architecture that powers GiveHope\'s trust-first approach.',
-      avatar: '/public/avatar-sky.jpeg',
+      avatar: '/public/avatar-alvin.jpeg',
     },
   ];
 
