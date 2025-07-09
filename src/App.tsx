@@ -11,6 +11,8 @@ import { ProjectDetails } from './pages/ProjectDetails';
 import { CreateCampaign } from './pages/CreateCampaign';
 import { About } from './pages/About';
 import { Dashboard } from './pages/Dashboard';
+import { StagewiseToolbar } from '@stagewise/toolbar-react';
+import ReactPlugin from '@stagewise-plugins/react';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -19,6 +21,9 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <WagmiProvider config={config}>
+      {import.meta.env.DEV && (
+        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
+      )}
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
           <Router>

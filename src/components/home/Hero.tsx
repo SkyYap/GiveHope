@@ -34,8 +34,8 @@ export const Hero: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-4xl lg:text-6xl font-bold leading-tight mb-6"
             >
-              Funding Hope{' '}
-              <span className="bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+              Reimagining Donations
+              <span className="block text-4xl lg:text-6xl font-extrabold leading-[1.1] pb-2 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
                 Fueling Impact
               </span>
             </motion.h1>
@@ -101,28 +101,17 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative"
+            className="relative flex items-center justify-center"
           >
-            <div className="relative bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
-              <div className="grid grid-cols-2 gap-4">
-                {/* Mock project cards */}
-                {[1, 2, 3, 4].map((i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.8 + i * 0.1 }}
-                    className="bg-white/20 backdrop-blur-sm rounded-lg p-4 border border-white/30"
-                  >
-                    <div className="w-full h-16 bg-white/30 rounded-lg mb-3" />
-                    <div className="space-y-2">
-                      <div className="h-3 bg-white/40 rounded w-3/4" />
-                      <div className="h-2 bg-white/30 rounded w-1/2" />
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+            <div className="absolute -top-8 w-full flex">
+              <span className="text-base font-semibold text-white/80 tracking-wide">Powered By</span>
             </div>
+            <img
+              src="/masverse-hero.png"
+              alt="Blockchain for Good x Masverse"
+              className="w-full max-w-2xl rounded-2xl shadow-lg border border-white/20"
+              style={{ objectFit: 'cover' }}
+            />
           </motion.div>
         </div>
       </div>
