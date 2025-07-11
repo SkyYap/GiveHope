@@ -1,0 +1,104 @@
+## eKYC Component Specification
+
+### 1. Create Wallet (Before eKYC)
+- **Endpoint:** `POST /api/wallet/create-user`
+  - **Request Body:**
+    ```json
+    {
+      "name": "Testing123",
+      "email": "testing_user@gmail.com",
+      "ic": "648524-70-2681",
+    }
+    ```
+- **Backend Flow:**
+  1. Call MasVerse API:
+      - `POST https://api.masverse.com/api/wallet/create-user`
+      - Body:
+        ```json
+        {
+          "name": "Testing123",
+          "email": "testing_user@gmail.com",
+          "ic": "648524-70-2681",
+        }
+        ```
+  2. MasVerse returns:
+      ```json
+      {
+        "status": 200,
+        "result": {
+            "wallet": {
+                "wallet_id": 1,
+                "wallet_name": "bob wallet",
+                "wallet_address": "0x556283a26F5C3d7bcB9a...",
+                "wallet_type": "user",
+                "is_active": 1,
+                "entity_id": null,
+                "entity_category_id": null,
+            }
+        }
+      }
+      ```
+  3. Store mapping: `result.wallet.wallet_address = masverseWalletAddress` (save to sqlite3)
+  4. Return to client:
+      ```json
+      {
+        "wallet_address": "<result.wallet.wallet_address from MasVerse>",
+      }
+      ```
+
+### 2. Start e-KYC
+- **Endpoint:** `POST /api/kyc/start`
+  - **Request Body:**
+    ```json
+    {
+      "walletAddress": "0xAbc123…"
+    }
+    ```
+- **Backend Flow:**
+  1. Call MasVerse API:
+      - `POST https://api.masverse.com/api/ekyc/verifications`
+      - Body:
+        ```json
+        {
+          "type": "00",                // 00 = OCR + FACE + LIVENESS, 01 = OCR Only
+          "id_country": "MYS",         // ISO 3166 alpha-3 country code
+          "id_type": "ID_CARD",        // ID_CARD or PASSPORT
+          "redirect_url": "https://localhost:5173/kyc/callback"
+        }
+        ```
+  2. MasVerse returns:
+      ```json
+      {
+        "status": 200,
+        "result": {
+            "url": "https://ekyc.maschain.com/verifications?token=441DSII3VF94US...",
+            "token": "441DSII3VF94US...."
+        }
+      }
+      ```
+  3. Store mapping: `kycSessions[verificationToken] = walletAddress` (save to sqlite3)
+  4. Return to client:
+      ```json
+      {
+        "verificationToken": "<result.token from MasVerse>",
+        "verificationUrl": "<result.url from MasVerse>"
+      }
+      ```
+
+### 3. Poll KYC Status
+- **Endpoint:** `GET /api/kyc/status/:walletAddress`
+- **Backend Flow:**
+  1. Look up `verificationToken` in sqlite3 DB using `walletAddress`
+  2. Call MasVerse:
+      - `GET https://api.masverse.com/api/ekyc/verifications/:verificationToken`
+  3. If `result.is_success: 1`:
+      - Mark `walletAddress` as `isKycVerified: true` (in sqlite3 DB)
+  4. Return to client:
+      ```json
+      {
+        "isKycVerified": true | false
+      }
+      ```
+
+### Storage Requirements
+- Use sqlite3 DB to store data
