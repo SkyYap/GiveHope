@@ -56,8 +56,14 @@ export const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<any>(null);
-
-  const { isConnected } = useAccount();
+  const [showKycModal, setShowKycModal] = useState(false);
+  const [kycNgoName, setKycNgoName] = useState("");
+  const [kycAdminEmail, setKycAdminEmail] = useState("");
+  const [kycAdminIc, setKycAdminIc] = useState("");
+  const [kycStep, setKycStep] = useState(1);
+  const [maschainWalletAddress, setMaschainWalletAddress] = useState("");
+  const [kycVerificationUrl, setKycVerificationUrl] = useState("");
+  const { address: web3WalletAddress } = useAccount();
 
   // Reset active tab when switching roles
   useEffect(() => {
@@ -224,6 +230,36 @@ export const Dashboard: React.FC = () => {
     setShowActivityModal(true);
   };
 
+  const handleKycSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/wallet/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ngoName: kycNgoName, adminEmail: kycAdminEmail, adminIc: kycAdminIc })
+      });
+      const data = await res.json();
+      setMaschainWalletAddress(data.walletAddress || "");
+      setKycStep(2);
+      // Optionally show success or error message
+    } catch (err) {
+      // Optionally handle error
+    }
+  };
+
+  useEffect(() => {
+    if (kycStep === 2 && web3WalletAddress && !maschainWalletAddress) {
+      fetch(`/api/wallet/by-web3/${web3WalletAddress}`)
+        .then(res => res.ok ? res.json() : Promise.reject(res))
+        .then(data => {
+          if (data.maschainWalletAddress) setMaschainWalletAddress(data.maschainWalletAddress);
+        })
+        .catch(() => {
+          setMaschainWalletAddress("");
+        });
+    }
+  }, [kycStep, web3WalletAddress, maschainWalletAddress]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -277,12 +313,88 @@ export const Dashboard: React.FC = () => {
               
               <div className="flex space-x-3">
                 {userRole === 'ngo' && (
-                  <Link to="/create">
-                    <Button className="flex items-center bg-green-600 hover:bg-green-700">
-                      <Plus className="w-4 h-4 mr-2" />
-                      New Campaign
-                    </Button>
-                  </Link>
+                  <>
+                    <Link to="#">
+                      <Button className="flex items-center bg-green-600 hover:bg-green-700" onClick={() => setShowKycModal(true)}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        e-KYC Your Account
+                      </Button>
+                    </Link>
+                    {showKycModal && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                        <Card className="w-full max-w-2xl p-12 relative">
+                          <button className="absolute top-5 right-6 text-3xl text-gray-400 hover:text-gray-600" onClick={() => { setShowKycModal(false); setKycStep(1); }}>&times;</button>
+                          {/* Stepper */}
+                          <div className="flex items-center justify-center mb-8">
+                            <div className="flex items-center space-x-8">
+                              <div className="flex flex-col items-center">
+                                <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold border-4 ${kycStep === 1 ? 'bg-blue-600 text-white border-blue-400' : 'bg-gray-200 text-gray-500 border-gray-300'}`}>1</div>
+                                <span className={`mt-2 font-semibold ${kycStep === 1 ? 'text-blue-700' : 'text-gray-500'}`}>Step 1</span>
+                              </div>
+                              <div className="w-12 h-1 bg-blue-200" />
+                              <div className="flex flex-col items-center">
+                                <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold border-4 ${kycStep === 2 ? 'bg-blue-600 text-white border-blue-400' : 'bg-gray-200 text-gray-500 border-gray-300'}`}>2</div>
+                                <span className={`mt-2 font-semibold ${kycStep === 2 ? 'text-blue-700' : 'text-gray-500'}`}>Step 2</span>
+                              </div>
+                              <div className="w-12 h-1 bg-blue-200" />
+                              <div className="flex flex-col items-center">
+                                <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold border-4 ${kycStep === 3 ? 'bg-blue-600 text-white border-blue-400' : 'bg-gray-200 text-gray-500 border-gray-300'}`}>3</div>
+                                <span className={`mt-2 font-semibold ${kycStep === 3 ? 'text-blue-700' : 'text-gray-500'}`}>Step 3</span>
+                              </div>
+                            </div>
+                          </div>
+                          <h2 className="text-3xl font-bold mb-6 text-center">e-KYC Your Account</h2>
+                          {kycStep === 1 && (
+                            <form onSubmit={handleKycSubmit} className="space-y-6">
+                              <div>
+                                <label className="block text-base font-medium mb-2">NGO Name</label>
+                                <input type="text" className="w-full border rounded px-4 py-3 text-lg" value={kycNgoName} onChange={e => setKycNgoName(e.target.value)} required />
+                              </div>
+                              <div>
+                                <label className="block text-base font-medium mb-2">Admin Email</label>
+                                <input type="email" className="w-full border rounded px-4 py-3 text-lg" value={kycAdminEmail} onChange={e => setKycAdminEmail(e.target.value)} required />
+                              </div>
+                              <div>
+                                <label className="block text-base font-medium mb-2">Admin IC</label>
+                                <input type="text" className="w-full border rounded px-4 py-3 text-lg" value={kycAdminIc} onChange={e => setKycAdminIc(e.target.value)} required />
+                              </div>
+                              <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-lg py-3">Next</Button>
+                            </form>
+                          )}
+                          {kycStep === 2 && (
+                            <div className="space-y-6">
+                              <div>
+                                <label className="block text-base font-medium mb-2">Web3 Wallet Address</label>
+                                <input type="text" className="w-full border rounded px-4 py-3 text-lg bg-gray-100 text-gray-500" value={web3WalletAddress || ''} disabled />
+                              </div>
+                              <div>
+                                <label className="block text-base font-medium mb-2">Maschain Wallet Address</label>
+                                <input type="text" className="w-full border rounded px-4 py-3 text-lg bg-gray-100 text-gray-500" value={maschainWalletAddress} disabled />
+                              </div>
+                              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3" onClick={() => {
+                                // Placeholder for /api/kyc/start integration
+                                setKycVerificationUrl('https://ekyc.maschain.com/your-kyc-link');
+                                setKycStep(3);
+                              }}>Confirm</Button>
+                            </div>
+                          )}
+                          {kycStep === 3 && (
+                            <div className="space-y-8 flex flex-col items-center justify-center">
+                              <div className="text-2xl font-bold text-center">Proceed to KYC Verification</div>
+                              <a
+                                href={kycVerificationUrl || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline text-lg font-medium px-6 py-4 rounded-lg border border-blue-200 hover:bg-blue-50 transition"
+                              >
+                                Click here to complete your KYC
+                              </a>
+                            </div>
+                          )}
+                        </Card>
+                      </div>
+                    )}
+                  </>
                 )}
                 {userRole === 'donor' && (
                   <Button className="flex items-center bg-purple-600 hover:bg-purple-700">
@@ -295,27 +407,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </motion.div>
 
-        {!isConnected ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-10 mt-10"
-          >
-            <img src="/placeholder-connect-wallet.svg" alt="Connect Wallet" className="w-32 h-32 mb-6" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Wallet Not Connected</h2>
-            <p className="text-lg text-gray-600 text-center mb-6">
-              Please connect your crypto wallet to access your dashboard and view your activity.
-            </p>
-            <ConnectButton.Custom>
-              {({ openConnectModal }) => (
-                <Button onClick={openConnectModal} className="bg-blue-600 hover:bg-blue-700">
-                  Connect Wallet
-                </Button>
-              )}
-            </ConnectButton.Custom>
-          </motion.div>
-        ) : (
+        {web3WalletAddress ? (
           <>
             {/* Quick Stats */}
             <motion.div
@@ -1181,6 +1273,26 @@ export const Dashboard: React.FC = () => {
               )}
             </motion.div>
           </>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col items-center justify-center bg-white rounded-lg shadow-lg p-10 mt-10"
+          >
+            <img src="/placeholder-connect-wallet.svg" alt="Connect Wallet" className="w-32 h-32 mb-6" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Wallet Not Connected</h2>
+            <p className="text-lg text-gray-600 text-center mb-6">
+              Please connect your crypto wallet to access your dashboard and view your activity.
+            </p>
+            <ConnectButton.Custom>
+              {({ openConnectModal }) => (
+                <Button onClick={openConnectModal} className="bg-blue-600 hover:bg-blue-700">
+                  Connect Wallet
+                </Button>
+              )}
+            </ConnectButton.Custom>
+          </motion.div>
         )}
 
         {/* Activity Detail Modal */}

@@ -148,6 +148,24 @@ app.get('/api/test/maschain-url', (req, res) => {
   res.json({ maschainApiUrl: MASCHAIN_API_URL });
 });
 
+app.get('/api/wallet/by-web3/:web3WalletAddress', async (req, res) => {
+  const { web3WalletAddress } = req.params;
+  if (!web3WalletAddress) {
+    return res.status(400).json({ error: 'web3WalletAddress is required' });
+  }
+  try {
+    const db = await getDb();
+    const session = await db.get('SELECT masverseWalletAddress FROM NGO_SESSIONS WHERE web3WalletAddress = ?', [web3WalletAddress]);
+    await db.close();
+    if (!session) {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    res.json({ maschainWalletAddress: session.masverseWalletAddress });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error', details: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
