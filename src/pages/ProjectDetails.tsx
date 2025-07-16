@@ -19,6 +19,9 @@ import { ProgressBar } from '../components/ui/ProgressBar';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import { ethers } from "ethers";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const ProjectDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +30,7 @@ export const ProjectDetails: React.FC = () => {
   const [donationDurationDays, setDonationDurationDays] = useState('365'); // Default to 1 year
   const [selectedYieldRatio, setSelectedYieldRatio] = useState(100); // Default to 100%
   const [impactYieldRatio, setImpactYieldRatio] = useState(100); // Default to 100% for impact projection
+  const [isStaking, setIsStaking] = useState(false);
 
   const project = mockProjects.find(p => p.id === id);
 
@@ -144,6 +148,51 @@ export const ProjectDetails: React.FC = () => {
     day: i + 1,
     impact: dailyInterest * (i + 1)
   }));
+
+  const handleStakeNow = async () => {
+    if (isStaking) return;
+    setIsStaking(true);
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      // Explicitly request account access to ensure MetaMask popup
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      const contractAddress = "0xD7B189A02f6Bc6f041346474B981C856479bFaC0";
+      const abi = [
+        {
+          "inputs": [
+            { "internalType": "uint256", "name": "_id", "type": "uint256" }
+          ],
+          "name": "donateToCampaign",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        }
+      ];
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+      const tx = await contract.donateToCampaign(0, { value: ethers.parseEther("0.01") });
+      console.log("Transaction hash:", tx.hash);
+      await tx.wait();
+      toast.success("Stake successful!");
+    } catch (err) {
+      console.error(err);
+      let errorMsg = "Transaction failed.";
+      if (typeof err === "string") {
+        errorMsg += " " + err;
+      } else if (err && typeof err === "object") {
+        if ("message" in err) errorMsg += " " + (err as any).message;
+        else if ("reason" in err) errorMsg += " " + (err as any).reason;
+        else errorMsg += " " + JSON.stringify(err);
+      }
+      if ((err as any).code === 4001 || (err as any).code === "ACTION_REJECTED") {
+        toast.error("You rejected the wallet request. Please approve it to continue.");
+      } else {
+        toast.error(errorMsg);
+      }
+    } finally {
+      setIsStaking(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -432,8 +481,8 @@ export const ProjectDetails: React.FC = () => {
                         ))}
                       </div>
                     </div>
-                    <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                      Stake Now
+                    <Button size="lg" className="w-full bg-green-600 hover:bg-green-700" onClick={handleStakeNow} disabled={isStaking}>
+                      {isStaking ? "Processing..." : "Stake Now"}
                     </Button>
                     <p className="text-xs text-gray-500 text-center">
                       Secure payment via smart contract
@@ -552,8 +601,8 @@ export const ProjectDetails: React.FC = () => {
                 />
               </div>
               <div>
-                <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                  Stake Now
+                <Button size="lg" className="w-full bg-green-600 hover:bg-green-700" onClick={handleStakeNow} disabled={isStaking}>
+                  {isStaking ? "Processing..." : "Stake Now"}
                 </Button>
               </div>
             </div>
