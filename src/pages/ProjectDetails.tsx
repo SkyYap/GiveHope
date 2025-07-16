@@ -29,6 +29,7 @@ export const ProjectDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [donationAmount, setDonationAmount] = useState('');
   const [donationDurationDays, setDonationDurationDays] = useState('365'); // Default to 1 year
+  const [selectedYieldRatio, setSelectedYieldRatio] = useState(100); // Default to 100%
 
   const project = mockProjects.find(p => p.id === id);
 
@@ -411,6 +412,38 @@ export const ProjectDetails: React.FC = () => {
                       onChange={(e) => setDonationAmount(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
+                    {/* Lock-in Period Selection */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Select lock-in period:</label>
+                      <div className="flex gap-2">
+                        {['6 Months', '1 Year', '2 Years'].map((period) => (
+                          <button
+                            key={period}
+                            type="button"
+                            className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors focus:outline-none ${donationDurationDays === period ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-green-50'}`}
+                            onClick={() => setDonationDurationDays(period)}
+                          >
+                            {period}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Yield-Sharing Ratio Selection */}
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Select yield-sharing ratio:</label>
+                      <div className="flex gap-2">
+                        {[50, 75, 100].map((ratio) => (
+                          <button
+                            key={ratio}
+                            type="button"
+                            className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-colors focus:outline-none ${selectedYieldRatio === ratio ? 'bg-green-600 text-white border-green-600' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-green-50'}`}
+                            onClick={() => setSelectedYieldRatio(ratio)}
+                          >
+                            {ratio}%
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
                       Stake Now
                     </Button>

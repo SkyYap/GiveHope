@@ -29,15 +29,15 @@ export const About: React.FC = () => {
   const team = [
     {
       name: 'Sky Yap',
-      role: 'CEO & Co-Founder',
-      bio: 'Coinbase incubatee who wants to revolutionize NGO funding via Web3 technology after witnessing funding challenges firsthand.',
-      avatar: '/public/avatar-sky.jpeg',
+      role: 'Co-Founder',
+      bio: 'Full-stack developer and DeFi native. Sky leads technical development —making sure the platform runs smoothly and securely',
+      avatar: '/avatar-sky.jpeg',
     },
     {
       name: 'Alvin Yap',
-      role: 'CTO & Co-Founder',
-      bio: 'Blockchain developer to solve the transparency crisis in charitable giving. Built the smart contract architecture that powers GiveHope\'s trust-first approach.',
-      avatar: '/public/avatar-alvin.jpeg',
+      role: 'Co-Founder',
+      bio: 'Visionary builder. leads product strategy and partnerships, ensuring GiveHope meets the real needs of both donors and NGOs.',
+      avatar: '/avatar-alvin.jpeg',
     },
   ];
 
