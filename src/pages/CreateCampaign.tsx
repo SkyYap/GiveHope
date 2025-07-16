@@ -398,7 +398,7 @@ export const CreateCampaign: React.FC = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Funding Goal (RM) *
+                      Funding Goal (USDC) *
                     </label>
                     <input
                       {...register('fundingGoal', { 
@@ -657,7 +657,7 @@ export const CreateCampaign: React.FC = () => {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Minimum Amount (RM)
+                            Minimum Amount (USDC)
                           </label>
                           <input
                             {...register(`rewardTiers.${index}.minAmount`, { required: 'Minimum amount is required', min: { value: 1, message: 'Minimum must be at least 1' } })}

@@ -17,8 +17,8 @@ export const mockProjects: Project[] = [
     shortDescription: 'Empowering futures through accessible education',
     coverImage: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg',
     category: categories[0],
-    fundingGoal: 500000,
-    currentFunding: 350000,
+    fundingGoal: 5000000,
+    currentFunding: 3500000,
     backers: 850,
     timeRemaining: 20,
     creator: {
@@ -37,8 +37,8 @@ export const mockProjects: Project[] = [
     shortDescription: 'Bringing clean, safe water to rural villages',
     coverImage: 'https://images.pexels.com/photos/2260655/pexels-photo-2260655.jpeg',
     category: categories[2],
-    fundingGoal: 750000,
-    currentFunding: 600000,
+    fundingGoal: 7500000,
+    currentFunding: 6000000,
     backers: 1500,
     timeRemaining: 12,
     creator: {
@@ -98,7 +98,7 @@ export const mockProjects: Project[] = [
     coverImage: 'https://images.pexels.com/photos/347140/pexels-photo-347140.jpeg',
     category: categories[2],
     fundingGoal: 800000,
-    currentFunding: 450000,
+    currentFunding: 400000,
     backers: 1100,
     timeRemaining: 18,
     creator: {

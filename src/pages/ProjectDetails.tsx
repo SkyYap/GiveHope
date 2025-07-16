@@ -30,6 +30,7 @@ export const ProjectDetails: React.FC = () => {
   const [donationAmount, setDonationAmount] = useState('');
   const [donationDurationDays, setDonationDurationDays] = useState('365'); // Default to 1 year
   const [selectedYieldRatio, setSelectedYieldRatio] = useState(100); // Default to 100%
+  const [impactYieldRatio, setImpactYieldRatio] = useState(100); // Default to 100% for impact projection
 
   const project = mockProjects.find(p => p.id === id);
 
@@ -53,7 +54,7 @@ export const ProjectDetails: React.FC = () => {
     { id: 'overview', label: 'Overview' },
     { id: 'updates', label: 'Updates' },
     { id: 'comments', label: 'Comments (127)' },
-    { id: 'donors', label: 'Donors' },
+    { id: 'backers', label: 'Backers' },
   ];
 
   const donationTiers = [
@@ -110,52 +111,43 @@ export const ProjectDetails: React.FC = () => {
       description: 'Community assessment and program design',
       targetDate: new Date('2024-03-15'),
       completed: true,
-      fundingRequired: 250000,
+      fundingRequired: 25000,
     },
     {
       title: 'Resource Acquisition',
       description: 'Procurement of necessary supplies and equipment',
       targetDate: new Date('2024-04-30'),
       completed: false,
-      fundingRequired: 500000,
+      fundingRequired: 50000,
     },
     {
       title: 'Program Launch',
       description: 'Official launch of community services',
       targetDate: new Date('2024-06-01'),
       completed: false,
-      fundingRequired: 750000,
+      fundingRequired: 75000,
     },
     {
       title: 'Impact Assessment',
       description: 'Evaluation of program effectiveness and community feedback',
       targetDate: new Date('2024-07-15'),
       completed: false,
-      fundingRequired: 1000000,
+      fundingRequired: 100000,
     },
   ];
 
-  const impactData: { day: number; impact: number }[] = [];
-
-  impactData.push({ day: 0, impact: 0 }); // Start from day 0 with 0 impact
-
-  const donationValue = Number(donationAmount) || 0;
-  const durationDays = Number(donationDurationDays) || 0;
-
-  if (durationDays > 0) {
-    const interval = 30; // Show points every 30 days (approx. monthly)
-    for (let d = interval; d < durationDays; d += interval) {
-      // Simple linear impact model - can be customized based on NGO's actual impact metrics
-      const impactValue = (donationValue / 100) * (d / 30); // Simplified impact calculation
-      impactData.push({ day: d, impact: Math.round(impactValue * 100) / 100 });
-    }
-
-    // Ensure the final day is included as a data point
-    if (impactData[impactData.length - 1].day !== durationDays) {
-      const impactValue = (donationValue / 100) * (durationDays / 30);
-      impactData.push({ day: durationDays, impact: Math.round(impactValue * 100) / 100 });
-    }
-  }
+  // Impact projection with 10% annual interest, prorated for period and yield-sharing ratio
+  const annualInterestRate = 0.10;
+  const principal = Number(donationAmount) || 0;
+  const duration = Number(donationDurationDays) || 1;
+  const yieldRatio = impactYieldRatio / 100;
+  const periodInterest = principal * annualInterestRate * (duration / 365);
+  const yieldSharedInterest = periodInterest * yieldRatio;
+  const dailyInterest = yieldSharedInterest / duration;
+  const impactData = Array.from({ length: duration }, (_, i) => ({
+    day: i + 1,
+    impact: dailyInterest * (i + 1)
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -325,7 +317,7 @@ export const ProjectDetails: React.FC = () => {
                                 </div>
                                 <p className="text-gray-600 text-sm mb-2">{milestone.description}</p>
                                 <p className="text-sm font-medium text-green-600">
-                                  Funding Required: RM{milestone.fundingRequired.toLocaleString()}
+                                  Funding Required: USD{milestone.fundingRequired.toLocaleString()}
                                 </p>
                               </div>
                             </div>
@@ -356,12 +348,12 @@ export const ProjectDetails: React.FC = () => {
                     </div>
                   )}
 
-                  {activeTab === 'donors' && (
+                  {activeTab === 'backers' && (
                     <div className="space-y-6">
                       <div className="text-center py-8">
                         <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                          {project.backers} Donors
+                          {project.backers} Backers
                         </h3>
                         <p className="text-gray-600">Join this amazing community of supporters.</p>
                       </div>
@@ -384,10 +376,10 @@ export const ProjectDetails: React.FC = () => {
                 <Card className="p-6">
                   <div className="text-center mb-6">
                     <div className="text-3xl font-bold text-gray-900 mb-2">
-                      RM {project.currentFunding.toLocaleString()}
+                      USD {project.currentFunding.toLocaleString()}
                     </div>
                     <div className="text-gray-600">
-                      of RM {project.fundingGoal.toLocaleString()} goal
+                      of USD {project.fundingGoal.toLocaleString()} target staked amount
                     </div>
                   </div>
 
@@ -396,7 +388,7 @@ export const ProjectDetails: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 mb-6 text-center">
                     <div>
                       <div className="text-2xl font-bold text-gray-900">{project.backers}</div>
-                      <div className="text-sm text-gray-600">Donors</div>
+                      <div className="text-sm text-gray-600">Backers</div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-gray-900">{daysLeft}</div>
@@ -407,7 +399,7 @@ export const ProjectDetails: React.FC = () => {
                   <div className="space-y-3">
                     <input
                       type="number"
-                      placeholder="Enter amount (RM)"
+                      placeholder="Enter amount (USDC)"
                       value={donationAmount}
                       onChange={(e) => setDonationAmount(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -468,7 +460,7 @@ export const ProjectDetails: React.FC = () => {
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-semibold text-gray-900">{tier.title}</h4>
                           <span className="text-sm font-medium text-green-600">
-                            RM{tier.minAmount}+
+                            USD{tier.minAmount}+
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mb-3">{tier.description}</p>
@@ -532,7 +524,7 @@ export const ProjectDetails: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">Impact Projection</h3>
             <div className="flex space-x-4 items-end mb-4">
               <div className="flex-1">
-                <label className="block text-sm text-gray-600 mb-1">Stake Amount (RM)</label>
+                <label className="block text-sm text-gray-600 mb-1"> Amount (USDC)</label>
                 <input
                   type="number"
                   placeholder="Enter amount"
@@ -551,6 +543,18 @@ export const ProjectDetails: React.FC = () => {
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
+              <div className="flex-1">
+                <label className="block text-sm text-gray-600 mb-1">Yield-Sharing Ratio (%)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={impactYieldRatio}
+                  onChange={e => setImpactYieldRatio(Number(e.target.value))}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
               <div>
                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
                   Stake Now
@@ -560,9 +564,15 @@ export const ProjectDetails: React.FC = () => {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={impactData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" label={{ value: 'Day', position: 'outsideBottom', offset: 30 }} />
+                <XAxis 
+                  dataKey="day" 
+                  label={{ value: 'Day', position: 'outsideBottom', offset: 30 }} 
+                  ticks={[30, 60, 90, 120, 150, duration]} // Show ticks every 30 days and the last day
+                />
                 <YAxis label={{ value: 'Actual Donate Amount', angle: -90, position: 'insideBottomLeft', offset: 30 }} />
-                <Tooltip />
+                <Tooltip 
+                  formatter={(value) => [`${Number(value).toFixed(2)} USDC`, 'Actual Donate Amount']} 
+                />
                 <Line type="monotone" dataKey="impact" stroke="#22c55e" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
