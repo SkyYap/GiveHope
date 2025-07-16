@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.20;
 
 contract CrowdFunding {
     address public owner;
@@ -28,7 +28,6 @@ contract CrowdFunding {
         CampaignCategory category;
         string projectDescription;
         uint256 goalAmount;
-        uint256 deadline;
         string image;
         TeamMember[] teamMembers;
         InvestmentTier[] investmentTiers;
@@ -51,7 +50,6 @@ contract CrowdFunding {
 
     modifier campaignValidForInteraction(uint256 _id) {
         require(campaigns[_id].status == CampaignStatus.Active, "Campaign is not active.");
-        require(block.timestamp < campaigns[_id].deadline, "Campaign deadline has passed.");
         _;
     }
 
@@ -62,7 +60,7 @@ contract CrowdFunding {
     // Internal Helper Function
     function _checkAndSetCampaignStatus(uint256 _id) internal campaignExists(_id) {
         Campaign storage campaign = campaigns[_id];
-        if (campaign.status == CampaignStatus.Active && block.timestamp >= campaign.deadline) {
+        if (campaign.status == CampaignStatus.Active) {
             if (campaign.currentAmount >= campaign.goalAmount) {
                 campaign.status = CampaignStatus.Successful;
             } else {
@@ -79,12 +77,10 @@ contract CrowdFunding {
         CampaignCategory _category,
         string memory _projectDescription,
         uint256 _goalAmount,
-        uint256 _deadline,
         string memory _image,
         TeamMember[] calldata _teamMembers,
         InvestmentTier[] calldata _investmentTiers
     ) public returns (uint256) {
-        require(_deadline > block.timestamp, "The deadline should be in the future.");
         require(_goalAmount > 0, "Goal amount must be greater than zero.");
         require(_campaignOwner != address(0), "Campaign owner cannot be zero address.");
 
@@ -96,7 +92,6 @@ contract CrowdFunding {
         newCampaign.category = _category;
         newCampaign.projectDescription = _projectDescription;
         newCampaign.goalAmount = _goalAmount;
-        newCampaign.deadline = _deadline;
         newCampaign.image = _image;
         newCampaign.teamMembers = _teamMembers;
         newCampaign.investmentTiers = _investmentTiers;
@@ -173,7 +168,6 @@ contract CrowdFunding {
         CampaignCategory category,
         string memory projectDescription,
         uint256 goalAmount,
-        uint256 deadline,
         uint256 currentAmount,
         CampaignStatus status,
         string memory image
@@ -186,7 +180,6 @@ contract CrowdFunding {
             campaign.category,
             campaign.projectDescription,
             campaign.goalAmount,
-            campaign.deadline,
             campaign.currentAmount,
             campaign.status,
             campaign.image

@@ -253,7 +253,7 @@ export const CreateCampaign: React.FC = () => {
             Create NGO Campaign
           </h1>
           <p className="text-xl text-gray-600">
-            Launch your humanitarian project and connect with compassionate donors worldwide
+            Launch your humanitarian project and connect with compassionate backers worldwide
           </p>
         </motion.div>
 
@@ -677,7 +677,7 @@ export const CreateCampaign: React.FC = () => {
                         <textarea
                           {...register(`rewardTiers.${index}.description`, { required: 'Description is required' })}
                           rows={2}
-                          placeholder="Describe what donors at this tier will receive (e.g., updates, recognition, etc.)..."
+                          placeholder="Describe what backers at this tier will receive (e.g., updates, recognition, etc.)..."
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         />
                         {Array.isArray(errors.rewardTiers) && errors.rewardTiers[index]?.description && (

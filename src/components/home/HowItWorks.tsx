@@ -20,7 +20,7 @@ export const HowItWorks: React.FC = () => {
     },
     {
       title: 'Community & Impact',
-      description: 'Join a passionate community of donors. Engage with NGOs, share your impact, and be part of a global movement for social good. Your donation becomes their success.',
+      description: 'Join a passionate community of backers. Engage with NGOs, share your impact, and be part of a global movement for social good. Your donation becomes their success.',
       image: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     },
   ];

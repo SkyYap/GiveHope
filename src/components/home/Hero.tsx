@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 export const Hero: React.FC = () => {
   const stats = [
     { icon: Heart, value: '$125M+', label: 'Total Raised' },
-    { icon: Users, value: '50K+', label: 'Active Donors' },
+    { icon: Users, value: '50K+', label: 'Active Backers' },
     { icon: Globe, value: '1.2K+', label: 'NGOs Supported' },
   ];
 

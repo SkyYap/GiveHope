@@ -74,30 +74,30 @@ export const Dashboard: React.FC = () => {
   const generateDonationData = (range: string) => {
     const baseData = {
       '7d': [
-        { period: 'Mon', amount: 1200, donors: 8, date: '2024-01-15' },
-        { period: 'Tue', amount: 1800, donors: 12, date: '2024-01-16' },
-        { period: 'Wed', amount: 2200, donors: 15, date: '2024-01-17' },
-        { period: 'Thu', amount: 1600, donors: 11, date: '2024-01-18' },
-        { period: 'Fri', amount: 2800, donors: 19, date: '2024-01-19' },
-        { period: 'Sat', amount: 3200, donors: 22, date: '2024-01-20' },
-        { period: 'Sun', amount: 2400, donors: 16, date: '2024-01-21' }
+        { period: 'Mon', amount: 1200, backers: 8, date: '2024-01-15' },
+        { period: 'Tue', amount: 1800, backers: 12, date: '2024-01-16' },
+        { period: 'Wed', amount: 2200, backers: 15, date: '2024-01-17' },
+        { period: 'Thu', amount: 1600, backers: 11, date: '2024-01-18' },
+        { period: 'Fri', amount: 2800, backers: 19, date: '2024-01-19' },
+        { period: 'Sat', amount: 3200, backers: 22, date: '2024-01-20' },
+        { period: 'Sun', amount: 2400, backers: 16, date: '2024-01-21' }
       ],
       '30d': [
-        { period: 'Week 1', amount: 12000, donors: 80, date: 'Jan 1-7' },
-        { period: 'Week 2', amount: 15000, donors: 95, date: 'Jan 8-14' },
-        { period: 'Week 3', amount: 18000, donors: 110, date: 'Jan 15-21' },
-        { period: 'Week 4', amount: 22000, donors: 130, date: 'Jan 22-28' }
+        { period: 'Week 1', amount: 12000, backers: 80, date: 'Jan 1-7' },
+        { period: 'Week 2', amount: 15000, backers: 95, date: 'Jan 8-14' },
+        { period: 'Week 3', amount: 18000, backers: 110, date: 'Jan 15-21' },
+        { period: 'Week 4', amount: 22000, backers: 130, date: 'Jan 22-28' }
       ],
       '90d': [
-        { period: 'Month 1', amount: 45000, donors: 320, date: 'Nov 2023' },
-        { period: 'Month 2', amount: 52000, donors: 380, date: 'Dec 2023' },
-        { period: 'Month 3', amount: 67000, donors: 450, date: 'Jan 2024' }
+        { period: 'Month 1', amount: 45000, backers: 320, date: 'Nov 2023' },
+        { period: 'Month 2', amount: 52000, backers: 380, date: 'Dec 2023' },
+        { period: 'Month 3', amount: 67000, backers: 450, date: 'Jan 2024' }
       ],
       '1y': [
-        { period: 'Q1', amount: 120000, donors: 800, date: 'Q1 2023' },
-        { period: 'Q2', amount: 145000, donors: 950, date: 'Q2 2023' },
-        { period: 'Q3', amount: 168000, donors: 1100, date: 'Q3 2023' },
-        { period: 'Q4', amount: 195000, donors: 1300, date: 'Q4 2023' }
+        { period: 'Q1', amount: 120000, backers: 800, date: 'Q1 2023' },
+        { period: 'Q2', amount: 145000, backers: 950, date: 'Q2 2023' },
+        { period: 'Q3', amount: 168000, backers: 1100, date: 'Q3 2023' },
+        { period: 'Q4', amount: 195000, backers: 1300, date: 'Q4 2023' }
       ]
     };
     return baseData[range as keyof typeof baseData] || baseData['30d'];
@@ -108,7 +108,7 @@ export const Dashboard: React.FC = () => {
   // Mock data for dashboard
   const ngoStats = {
     totalRaised: 2450000,
-    totalDonors: 1847,
+    totalBackers: 1847,
     activeCampaigns: 3,
     completedCampaigns: 7,
     totalImpact: 15420,
@@ -158,7 +158,7 @@ export const Dashboard: React.FC = () => {
       status: 'active',
       raised: 850000,
       goal: 1000000,
-      donors: 542,
+      backers: 542,
       daysLeft: 15,
       image: 'https://images.pexels.com/photos/2260655/pexels-photo-2260655.jpeg',
       category: 'Environment'
@@ -169,7 +169,7 @@ export const Dashboard: React.FC = () => {
       status: 'active',
       raised: 650000,
       goal: 800000,
-      donors: 789,
+      backers: 789,
       daysLeft: 28,
       image: 'https://images.pexels.com/photos/3184428/pexels-photo-3184428.jpeg',
       category: 'Education'
@@ -180,7 +180,7 @@ export const Dashboard: React.FC = () => {
       status: 'active',
       raised: 950000,
       goal: 1200000,
-      donors: 516,
+      backers: 516,
       daysLeft: 42,
       image: 'https://images.pexels.com/photos/4033148/pexels-photo-4033148.jpeg',
       category: 'Healthcare'
@@ -423,7 +423,7 @@ export const Dashboard: React.FC = () => {
                       <div>
                         <p className="text-blue-100 text-sm font-medium">Total Raised</p>
                         <div className="text-2xl font-bold">
-                          <AnimatedCounter value={ngoStats.totalRaised} prefix="RM " />
+                          <AnimatedCounter value={ngoStats.totalRaised} prefix="USD " />
                         </div>
                         <div className="flex items-center mt-2 text-blue-100">
                           <ArrowUpRight className="w-4 h-4 mr-1" />
@@ -437,9 +437,9 @@ export const Dashboard: React.FC = () => {
                   <Card className="p-6 bg-gradient-to-br from-green-500 to-green-600 text-white">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-green-100 text-sm font-medium">Total Donors</p>
+                        <p className="text-green-100 text-sm font-medium">Total Backers</p>
                         <div className="text-2xl font-bold">
-                          <AnimatedCounter value={ngoStats.totalDonors} />
+                          <AnimatedCounter value={ngoStats.totalBackers} />
                         </div>
                         <div className="flex items-center mt-2 text-green-100">
                           <ArrowUpRight className="w-4 h-4 mr-1" />
@@ -471,7 +471,7 @@ export const Dashboard: React.FC = () => {
                       <div>
                         <p className="text-orange-100 text-sm font-medium">Avg. Donation</p>
                         <div className="text-2xl font-bold">
-                          <AnimatedCounter value={ngoStats.averageDonation} prefix="RM " />
+                          <AnimatedCounter value={ngoStats.averageDonation} prefix="USD" />
                         </div>
                         <div className="flex items-center mt-2 text-orange-100">
                           <TrendingUp className="w-4 h-4 mr-1" />
@@ -489,7 +489,7 @@ export const Dashboard: React.FC = () => {
                       <div>
                         <p className="text-blue-100 text-sm font-medium">Total Donated</p>
                         <div className="text-2xl font-bold">
-                          <AnimatedCounter value={donorStats.totalDonated} prefix="RM " />
+                          <AnimatedCounter value={donorStats.totalDonated} prefix="USD" />
                         </div>
                         <div className="flex items-center mt-2 text-blue-100">
                           <ArrowUpRight className="w-4 h-4 mr-1" />
@@ -525,7 +525,7 @@ export const Dashboard: React.FC = () => {
                         </div>
                         <div className="flex items-center mt-2 text-purple-100">
                           <Award className="w-4 h-4 mr-1" />
-                          <span className="text-sm">Monthly avg: RM{donorStats.monthlyAverage}</span>
+                          <span className="text-sm">Monthly avg: USD{donorStats.monthlyAverage}</span>
                         </div>
                       </div>
                       <Award className="w-8 h-8 text-purple-200" />
@@ -614,11 +614,11 @@ export const Dashboard: React.FC = () => {
                           <XAxis dataKey="period" />
                           <YAxis />
                           <Tooltip 
-                            formatter={(value: ValueType, name: "amount" | "donors") => [
-                              name === 'amount' ? `RM ${value.toLocaleString()}` : value,
-                              name === 'amount' ? 'Amount' : 'Donors'
+                            formatter={(value: ValueType, name: "amount" | "backers") => [
+                              name === 'amount' ? `USD ${value.toLocaleString()}` : value,
+                              name === 'amount' ? 'Amount' : 'Backers'
                             ]}
-                            labelFormatter={(label: any, payload: Payload<ValueType, "amount" | "donors">[]) => {
+                            labelFormatter={(label: any, payload: Payload<ValueType, "amount" | "backers">[]) => {
                               if (payload && payload[0]) {
                                 return `${label} (${payload[0].payload.date})`;
                               }
@@ -626,7 +626,7 @@ export const Dashboard: React.FC = () => {
                             }}
                           />
                           <Area type="monotone" dataKey="amount" stackId="1" stroke="#22c55e" fill="#22c55e" fillOpacity={0.6} />
-                          <Area type="monotone" dataKey="donors" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
+                          <Area type="monotone" dataKey="backers" stackId="2" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.6} />
                         </AreaChart>
                       </ResponsiveContainer>
                     </Card>
@@ -657,8 +657,8 @@ export const Dashboard: React.FC = () => {
                                     </div>
                                     <ProgressBar progress={progress} className="mb-2" />
                                     <div className="flex items-center justify-between text-sm text-gray-600">
-                                      <span>RM {campaign.raised.toLocaleString()} of RM {campaign.goal.toLocaleString()}</span>
-                                      <span>{campaign.donors} donors • {campaign.daysLeft} days left</span>
+                                      <span>USD {campaign.raised.toLocaleString()} of USD {campaign.goal.toLocaleString()}</span>
+                                      <span>{campaign.backers} backers • {campaign.daysLeft} days since launch</span>
                                     </div>
                                   </div>
                                   <div className="flex space-x-2">
@@ -687,7 +687,7 @@ export const Dashboard: React.FC = () => {
                               <div className="flex items-center justify-between mb-2">
                                 <h4 className="font-semibold text-gray-900">{donation.ngo}</h4>
                                 <span className="text-lg font-bold text-green-600">
-                                  RM {donation.amount}
+                                  USD {donation.amount}
                                 </span>
                               </div>
                               <p className="text-sm text-gray-600 mb-2">{donation.impact}</p>
@@ -742,7 +742,7 @@ export const Dashboard: React.FC = () => {
                             </div>
                             <div className="text-right">
                               <p className="text-sm font-semibold text-green-600">
-                                +RM {donation.amount}
+                                +USD {donation.amount}
                               </p>
                               <p className="text-xs text-gray-500">
                                 {donation.time}
@@ -792,7 +792,7 @@ export const Dashboard: React.FC = () => {
                             </Link>
                             <Button variant="outline" className="w-full justify-start">
                               <Bell className="w-4 h-4 mr-2" />
-                              Send Update to Donors
+                              Send Update to Backers
                             </Button>
                             <Button variant="outline" className="w-full justify-start">
                               <Settings className="w-4 h-4 mr-2" />
@@ -871,7 +871,7 @@ export const Dashboard: React.FC = () => {
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                                RM {donation.amount.toLocaleString()}
+                                USD {donation.amount.toLocaleString()}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                 {donation.date}
@@ -920,7 +920,7 @@ export const Dashboard: React.FC = () => {
                           <div className="space-y-2 text-sm text-gray-600 mb-4">
                             <div className="flex justify-between">
                               <span>Total Donated:</span>
-                              <span className="font-semibold text-green-600">RM {ngo.totalDonated}</span>
+                              <span className="font-semibold text-green-600">USD {ngo.totalDonated}</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Campaigns Supported:</span>
@@ -997,12 +997,12 @@ export const Dashboard: React.FC = () => {
                             <h3 className="text-lg font-semibold text-gray-900 mb-3">{campaign.title}</h3>
                             <ProgressBar progress={progress} className="mb-3" />
                             <div className="flex justify-between text-sm text-gray-600 mb-4">
-                              <span>RM {campaign.raised.toLocaleString()}</span>
+                              <span>USD {campaign.raised.toLocaleString()}</span>
                               <span>{progress.toFixed(0)}% funded</span>
                             </div>
                             <div className="flex justify-between text-sm text-gray-600 mb-4">
-                              <span>{campaign.donors} donors</span>
-                              <span>{campaign.daysLeft} days left</span>
+                              <span>{campaign.backers} backers</span>
+                              <span>{campaign.daysLeft} days since launch</span>
                             </div>
                             <div className="flex space-x-2">
                               <Button variant="outline" size="sm" className="flex-1">
@@ -1058,7 +1058,7 @@ export const Dashboard: React.FC = () => {
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey="period" />
                           <YAxis />
-                          <Tooltip formatter={(value) => [`RM ${value.toLocaleString()}`, 'Amount']} />
+                          <Tooltip formatter={(value) => [`USD ${value.toLocaleString()}`, 'Amount']} />
                           <Bar dataKey="amount" fill="#22c55e" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
@@ -1081,7 +1081,7 @@ export const Dashboard: React.FC = () => {
                       </div>
                       <div className="text-center">
                         <div className="text-3xl font-bold text-green-600 mb-2">
-                          <AnimatedCounter value={ngoStats.averageDonation} prefix="RM " />
+                          <AnimatedCounter value={ngoStats.averageDonation} prefix="USD" />
                         </div>
                         <p className="text-gray-600">Average Donation</p>
                         <div className="flex items-center justify-center mt-2 text-green-600">
@@ -1161,7 +1161,7 @@ export const Dashboard: React.FC = () => {
                                 {donation.campaign}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                                RM {donation.amount.toLocaleString()}
+                            USD {donation.amount.toLocaleString()}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                                 {donation.time}
@@ -1224,7 +1224,7 @@ export const Dashboard: React.FC = () => {
                           <Tooltip />
                           <Line 
                             type="monotone" 
-                            dataKey="donors" 
+                            dataKey="backers" 
                             stroke="#22c55e" 
                             strokeWidth={3}
                             dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
@@ -1331,7 +1331,7 @@ export const Dashboard: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-500">Amount</p>
-                      <p className="font-semibold text-green-600">RM {selectedActivity.amount}</p>
+                      <p className="font-semibold text-green-600">USD {selectedActivity.amount}</p>
                     </div>
                     <div>
                       <p className="text-gray-500">Campaign</p>

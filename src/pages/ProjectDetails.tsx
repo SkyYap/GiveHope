@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, 
-  Clock, 
   Users, 
   CheckCircle2, 
   Share2, 
@@ -12,9 +11,6 @@ import {
   Twitter,
   Github,
   MessageSquare,
-  Calendar,
-  Target,
-  Trophy
 } from 'lucide-react';
 import { mockProjects } from '../data/mockData';
 import { Button } from '../components/ui/Button';
@@ -392,7 +388,7 @@ export const ProjectDetails: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-gray-900">{daysLeft}</div>
-                      <div className="text-sm text-gray-600">Days left</div>
+                      <div className="text-sm text-gray-600">Days since launch</div>
                     </div>
                   </div>
 

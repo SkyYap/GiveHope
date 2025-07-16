@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
+contracts/broadcast/DeployCrowdFunding.s.sol/84532/run-latest.json
+contracts/broadcast/DeployCrowdFunding.s.sol/84532/run-1752685282.json
+contracts/broadcast/DeployCrowdFunding.s.sol/84532/run-1752689210.json
+contracts/broadcast/DeployCrowdFunding.s.sol/84532/run-1752685903.json

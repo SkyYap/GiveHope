@@ -54,7 +54,7 @@ export const Footer: React.FC = () => {
               <span className="text-xl font-bold text-gray-900">GiveHope</span>
             </Link>
             <p className="text-gray-600 text-sm mb-4">
-              The leading platform connecting NGOs with donors worldwide.
+              The leading platform connecting NGOs with backers worldwide.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">

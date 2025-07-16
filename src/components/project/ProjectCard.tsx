@@ -70,7 +70,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, index = 0 }) 
             <div className="mb-4">
               <ProgressBar progress={progress} className="mb-2" />
               <div className="flex justify-between text-sm text-gray-600">
-                <span>RM{project.currentFunding.toLocaleString()} raised</span>
+                <span>USDC{project.currentFunding.toLocaleString()} raised</span>
                 <span>{progress.toFixed(0)}% funded</span>
               </div>
             </div>
@@ -79,7 +79,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, index = 0 }) 
             <div className="flex items-center justify-between text-sm text-gray-600">
               <div className="flex items-center space-x-1">
                 <Users className="w-4 h-4" />
-                <span>{project.backers} donors</span>
+                <span>{project.backers} backers</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Clock className="w-4 h-4" />

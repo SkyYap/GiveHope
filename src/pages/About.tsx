@@ -12,7 +12,7 @@ export const About: React.FC = () => {
     {
       icon: Users,
       title: 'Community Driven',
-      description: 'Built by the community, for the community. Every decision is made with our donors and NGOs in mind.',
+      description: 'Built by the community, for the community. Every decision is made with our backers and NGOs in mind.',
     },
     {
       icon: Globe,
@@ -36,7 +36,7 @@ export const About: React.FC = () => {
     {
       name: 'Alvin Yap',
       role: 'Co-Founder',
-      bio: 'Visionary builder. leads product strategy and partnerships, ensuring GiveHope meets the real needs of both donors and NGOs.',
+      bio: 'Visionary builder. leads product strategy and partnerships, ensuring GiveHope meets the real needs of both backers and NGOs.',
       avatar: '/avatar-alvin.jpeg',
     },
   ];
@@ -44,7 +44,7 @@ export const About: React.FC = () => {
   const stats = [
     { value: '$125M+', label: 'Total Funds Raised' },
     { value: '1,200+', label: 'NGOs Supported' },
-    { value: '50K+', label: 'Active Donors' },
+    { value: '50K+', label: 'Active Backers' },
     { value: '99.8%', label: 'Funds Reaching NGOs' },
   ];
 
@@ -63,7 +63,7 @@ export const About: React.FC = () => {
               About GiveHope
             </h1>
             <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              We're building a more transparent and effective way to connect donors with NGOs, 
+              We're building a more transparent and effective way to connect backers with NGOs, 
               ensuring every contribution creates maximum impact for communities in need.
             </p>
           </motion.div>
@@ -85,7 +85,7 @@ export const About: React.FC = () => {
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">
                 We believe in the transformative power of humanitarian work and the importance of 
                 democratizing access to funding for NGOs worldwide. Our platform bridges the gap 
-                between compassionate donors and impactful organizations.
+                between compassionate backers and impactful organizations.
               </p>
               <p className="text-lg text-gray-600 leading-relaxed">
                 By providing a secure, transparent, and user-friendly donation platform specifically 
