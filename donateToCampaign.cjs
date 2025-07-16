@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // --- CONFIGURE THESE ---
-const RPC_URL = "https://base-sepolia.g.alchemy.com/v2/qSjLP9fnjRpWp6RIGhZ2NUuslo0dqlKC"; // e.g., Infura/Alchemy endpoint
+const RPC_URL = process.env.RPC_URL; // e.g., Infura/Alchemy endpoint
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const CONTRACT_ADDRESS = "0xD7B189A02f6Bc6f041346474B981C856479bFaC0";
 const ABI = [
